@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Frontline Healthcare — Employee Onboarding & Training Portal</title>
+<style>
+:root{
+  --teal:#028090; --deep:#014A54; --seafoam:#00A896; --mint:#6FD8C7;
+  --ink:#1A2E35; --slate:#526A72; --light:#F1F6F7; --amber:#F2A94B; --rust:#C0463A;
+  --white:#fff; --line:#dce7e9; --ok:#1f8a5b;
+  --shadow:0 6px 20px rgba(26,46,53,.10); --radius:14px;
+  --head:Georgia,'Times New Roman',serif; --body:'Segoe UI',Calibri,system-ui,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:var(--body);color:var(--ink);background:var(--light);line-height:1.5}
+button{font-family:inherit;cursor:pointer}
+a{color:var(--teal)}
+.hidden{display:none!important}
+.wrap{max-width:1080px;margin:0 auto;padding:0 18px}
+.topbar{background:var(--deep);color:#fff;position:sticky;top:0;z-index:20;box-shadow:var(--shadow)}
+.topbar .wrap{display:flex;align-items:center;gap:14px;height:62px}
+.brand{font-family:var(--head);font-weight:700;font-size:20px;letter-spacing:.2px}
+.brand small{display:block;font-family:var(--body);font-weight:400;font-size:11px;color:var(--mint);letter-spacing:.6px;text-transform:uppercase}
+.topbar .spacer{flex:1}
+.whoami{font-size:13px;color:var(--mint);text-align:right}
+.whoami b{color:#fff;display:block;font-size:14px}
+.linkbtn{background:transparent;border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:8px;padding:7px 12px;font-size:12.5px}
+.linkbtn:hover{background:rgba(255,255,255,.12)}
+.signin{min-height:90vh;display:flex;align-items:center;justify-content:center;padding:30px 18px;background:linear-gradient(135deg,#014A54,#02808f 70%,#00A896)}
+.card-signin{background:#fff;border-radius:18px;box-shadow:0 18px 50px rgba(0,0,0,.25);max-width:440px;width:100%;padding:34px 32px;text-align:center}
+.logo-dot{width:64px;height:64px;border-radius:50%;background:var(--teal);margin:0 auto 14px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--head);font-weight:700;font-size:28px}
+.card-signin h1{font-family:var(--head);font-size:25px;margin:.1em 0 .2em}
+.card-signin p.sub{color:var(--slate);font-size:14px;margin:.2em 0 1.3em}
+.field{text-align:left;margin:0 0 14px}
+.field label{display:block;font-size:12.5px;font-weight:600;color:var(--slate);margin:0 0 5px}
+.field .req{color:var(--rust)}
+.field input,.field select,.field textarea{width:100%;padding:11px 12px;border:1.5px solid var(--line);border-radius:10px;font-size:15px;color:var(--ink);background:#fff;font-family:inherit}
+.field textarea{min-height:64px;resize:vertical}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--teal)}
+.btn{background:var(--teal);color:#fff;border:none;border-radius:10px;padding:12px 18px;font-size:15px;font-weight:600;width:100%}
+.btn:hover{background:#026d7a}
+.btn.amber{background:var(--amber);color:#3a2a06}.btn.amber:hover{background:#e89a35}
+.btn.ghost{background:#fff;color:var(--teal);border:1.5px solid var(--teal)}
+.btn.ghost:hover{background:var(--light)}
+.btn.sm{width:auto;padding:9px 16px;font-size:13.5px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.fineprint{font-size:11.5px;color:var(--slate);margin-top:16px;line-height:1.45}
+.page{padding:26px 0 70px}
+.hello{font-family:var(--head);font-size:27px;margin:0 0 4px}
+.hello small{font-family:var(--body);font-size:14px;color:var(--slate);font-weight:400}
+.bar-outer{background:#e4eef0;height:12px;border-radius:8px;overflow:hidden;margin:14px 0 4px}
+.bar-inner{background:linear-gradient(90deg,var(--seafoam),var(--teal));height:100%;width:0;transition:width .5s}
+.progress-row{display:flex;justify-content:space-between;font-size:12.5px;color:var(--slate)}
+.statline{display:flex;gap:18px;flex-wrap:wrap;margin:10px 0 0;font-size:12.5px;color:var(--slate)}
+.statline b{color:var(--deep)}
+.section-title{font-family:var(--head);font-size:19px;margin:30px 0 6px;display:flex;align-items:center;gap:9px}
+.section-title .ic{width:30px;height:30px;border-radius:8px;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px}
+.section-sub{margin:0 0 12px;color:var(--slate);font-size:13.5px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.tile{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;display:flex;flex-direction:column;gap:8px;border-top:4px solid var(--teal);position:relative}
+.tile h3{margin:2px 0 0;font-size:16px}
+.tile p{margin:0;font-size:13px;color:var(--slate);flex:1}
+.tile .meta{font-size:11.5px;color:var(--slate)}
+.tile .badge{position:absolute;top:14px;right:14px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px}
+.badge.done{background:#e3f5ec;color:var(--ok)}
+.badge.todo{background:#eef3f4;color:var(--slate)}
+.badge.prog{background:#fdeedd;color:#b5790f}
+.tile .row{display:flex;gap:8px;align-items:center;margin-top:6px;flex-wrap:wrap}
+.tile-ic{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:19px;color:#fff;background:var(--teal)}
+.tile.video{border-top-color:var(--amber)} .tile.video .tile-ic{background:var(--amber)}
+.tile.comp{border-top-color:var(--seafoam)} .tile.comp .tile-ic{background:var(--seafoam)}
+.tile.doc{border-top-color:var(--deep)} .tile.doc .tile-ic{background:var(--deep)}
+.tile.prof{border-top-color:var(--amber)}
+.viewer{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.viewer-head{background:var(--deep);color:#fff;padding:18px 24px}
+.viewer-head .kick{font-size:11.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--mint)}
+.viewer-head h2{font-family:var(--head);margin:3px 0 0;font-size:23px}
+.steps-dots{display:flex;gap:6px;padding:14px 24px 0;flex-wrap:wrap}
+.dot{height:7px;border-radius:6px;background:#dce7e9;flex:1;min-width:18px}
+.dot.active{background:var(--teal)} .dot.done{background:var(--seafoam)}
+.viewer-body{padding:22px 28px;min-height:230px}
+.viewer-body h3{font-family:var(--head);font-size:20px;margin:.1em 0 .5em;color:var(--deep)}
+.viewer-body p{font-size:15px;margin:.2em 0 .8em}
+.viewer-body ul{margin:.2em 0 .9em;padding-left:20px} .viewer-body li{font-size:14.5px;margin:5px 0}
+.callout{background:var(--light);border-left:4px solid var(--amber);padding:12px 14px;border-radius:0 10px 10px 0;font-size:14px;margin:.6em 0}
+.callout b{color:var(--deep)}
+.viewer-foot{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;border-top:1px solid var(--line);background:#fafcfc}
+.viewer-foot .stepcount{font-size:13px;color:var(--slate)}
+.qblock{margin:0 0 18px}
+.qblock .qq{font-weight:600;font-size:15.5px;margin:0 0 10px}
+.opt{display:block;border:1.5px solid var(--line);border-radius:10px;padding:11px 13px;margin:8px 0;font-size:14.5px;background:#fff;cursor:pointer;transition:.15s}
+.opt:hover{border-color:var(--teal);background:var(--light)}
+.opt.sel{border-color:var(--teal);background:#e9f5f6}
+.opt.correct{border-color:var(--ok);background:#e3f5ec}
+.opt.wrong{border-color:var(--rust);background:#fbe9e7}
+.opt input{margin-right:9px}
+.result{text-align:center;padding:14px}
+.score-ring{width:120px;height:120px;border-radius:50%;margin:6px auto 10px;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:700;font-family:var(--head);color:#fff}
+.cert{border:3px double var(--teal);border-radius:14px;padding:32px;text-align:center;background:linear-gradient(180deg,#fff,#f6fbfb)}
+.cert .seal{width:60px;height:60px;border-radius:50%;background:var(--amber);margin:0 auto 10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:28px}
+.cert h2{font-family:var(--head);font-size:26px;margin:.1em 0}
+.cert .name{font-family:var(--head);font-size:30px;color:var(--deep);margin:.3em 0;border-bottom:2px solid var(--line);display:inline-block;padding:0 30px 6px}
+.cert .muted{color:var(--slate);font-size:14px}
+.backlink{background:none;border:none;color:var(--teal);font-size:14px;padding:8px 0;display:inline-flex;gap:6px;align-items:center}
+.note{font-size:12.5px;color:var(--slate);background:#fff;border:1px dashed var(--line);border-radius:10px;padding:10px 12px;margin:14px 0}
+.embed-slot{background:#0b1c20;border-radius:12px;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;color:#9fc4c9;font-size:14px;text-align:center;padding:20px}
+.flex{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+/* forms / profile */
+.formcard{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 26px;margin:0 0 18px}
+.formcard h3{font-family:var(--head);color:var(--deep);font-size:18px;margin:0 0 4px}
+.formcard .fsub{color:var(--slate);font-size:13px;margin:0 0 16px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-grid .full{grid-column:1/-1}
+@media(max-width:620px){.form-grid{grid-template-columns:1fr}}
+.photo-uploader{display:flex;gap:16px;align-items:center}
+.avatar{width:88px;height:88px;border-radius:50%;background:var(--light);border:2px dashed var(--line);display:flex;align-items:center;justify-content:center;color:var(--slate);font-size:12px;overflow:hidden;flex:0 0 auto}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.secure-banner{background:#eef7f8;border:1.5px solid var(--mint);border-radius:12px;padding:14px 16px;font-size:13.5px;color:var(--deep);margin:0 0 16px}
+.secure-banner b{color:var(--teal)}
+.doc-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1.5px solid var(--line);border-radius:11px;margin:8px 0;background:#fff}
+.doc-item .di-ic{width:34px;height:34px;border-radius:8px;background:var(--light);display:flex;align-items:center;justify-content:center;font-size:17px;flex:0 0 auto}
+.doc-item .di-txt{flex:1}.doc-item .di-txt b{font-size:14.5px}.doc-item .di-txt span{display:block;font-size:12px;color:var(--slate)}
+.doc-item input[type=checkbox]{width:20px;height:20px;accent-color:var(--teal)}
+.pill{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;background:#eef3f4;color:var(--slate);margin-left:6px}
+.pill.req{background:#fde7e3;color:var(--rust)}
+/* toast */
+#toasts{position:fixed;right:18px;bottom:18px;z-index:60;display:flex;flex-direction:column;gap:10px;max-width:320px}
+.toast{background:var(--deep);color:#fff;border-radius:12px;padding:12px 15px;box-shadow:0 10px 30px rgba(0,0,0,.25);font-size:13.5px;opacity:0;transform:translateY(12px);transition:.3s;border-left:4px solid var(--seafoam)}
+.toast.show{opacity:1;transform:none}
+.toast b{display:block;color:var(--mint);font-size:12px;margin-bottom:2px}
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(1,30,34,.55);display:flex;align-items:center;justify-content:center;z-index:70;padding:20px}
+.modal-card{background:#fff;border-radius:18px;max-width:520px;width:100%;padding:30px;text-align:center;box-shadow:0 25px 60px rgba(0,0,0,.35)}
+.modal-card .big{width:74px;height:74px;border-radius:50%;background:#e3f5ec;color:var(--ok);display:flex;align-items:center;justify-content:center;font-size:38px;margin:0 auto 14px}
+.modal-card h2{font-family:var(--head);font-size:25px;margin:.1em 0 .3em;color:var(--deep)}
+.modal-card p{color:var(--slate);font-size:14.5px}
+@media print{.topbar,.viewer-foot,.no-print,#toasts{display:none!important}body{background:#fff}}
+@media(max-width:560px){.topbar .wrap{height:auto;padding:10px 18px;flex-wrap:wrap}.hello{font-size:22px}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toasts"></div>
+<script>
+/* ===================== CONFIG (admin: edit these) ===================== */
+const CONFIG = {
+  // Onboarding access codes issued by the administrative team. Add one per employee.
+  // Example: "FLH-2026-AMARA". Leave array empty to allow any code.
+  validCodes: ["FLH-ONBOARD"],
+  // Secure form where SSN, driver's license #, and document UPLOADS are collected.
+  // Paste your Wix Form (or JotForm/Google Form) link here:
+  secureFormUrl: "https://alkahlivin7.wixforms.com/f/7471759551868437548",
+  // Optional: email shown to employees for help
+  onboardingEmail: "info@frontlinehealthcareohio.com"
+};
+
+/* ===================== ONBOARDING MODULES ===================== */
+const ONBOARDING = [
+  { id:"welcome", icon:"👋", title:"Welcome & Our Mission", min:12,
+    desc:"Meet Frontline Healthcare, our mission, and our core values.",
+    steps:[
+      {h:"Welcome to the Frontline family", b:`<p>From our Founder & CEO, Millicent Ferguson:</p>
+        <div class="callout"><i>"Welcome to the heart of Frontline Healthcare, where compassion meets purpose, and every team member is seen, valued, and empowered. You belong here! You were chosen because your spirit aligned with something much greater — a mission rooted in love, dignity, and caring."</i></div>
+        <p>You are now part of a team of changemakers, healers, and everyday heroes. Whatever your role, your contribution matters deeply.</p>`},
+      {h:"Our mission", b:`<div class="callout"><b>Mission:</b> "At Frontline Healthcare, we are committed to creating an inclusive and empowering environment where every individual is treated with dignity and compassion. We blend personalized care with both traditional and natural approaches to support the overall well-being of the mind, body, and spirit."</div>
+        <p>We are an Ohio DODD-certified agency supporting individuals with developmental disabilities through person-centered, home and community-based services.</p>`},
+      {h:"Our core values", b:`<p>These are the core values that guide everything we do at Frontline Healthcare:</p><ul>
+        <li><b>Integrity</b> — we hold ourselves to the highest ethical standards, acting with honesty, accountability, and respect in all that we do.</li>
+        <li><b>Inclusive Care</b> — we embrace and celebrate diversity, ensuring our services are accessible, respectful, and empowering to all, especially individuals with developmental disabilities.</li>
+        <li><b>Compassion</b> — we treat every individual with empathy, patience, and genuine care, honoring the humanity in every interaction.</li>
+        <li><b>Holistic Respect</b> — we value both traditional medicine and natural wellness, honoring the unique needs of every individual.</li>
+        <li><b>Collaboration & Community</b> — we believe in the power of teamwork and community partnerships to create lasting change and shared success.</li></ul>`}
+    ]},
+  { id:"working", icon:"🗓️", title:"Pay, Schedule & Time Off", min:14,
+    desc:"Schedules, timekeeping, payday, attendance, and requesting time off.",
+    steps:[
+      {h:"Your schedule & timekeeping", b:`<ul>
+        <li>Work your scheduled hours — coverage keeps the people we serve safe.</li>
+        <li>Arrive at least 5 minutes before your shift; arriving 3+ minutes late counts as tardy.</li>
+        <li>Record arrival and departure accurately on your timesheet — never falsify times.</li>
+        <li>You may switch shifts only with a signed, supervisor-approved alternative-shift agreement.</li></ul>`},
+      {h:"Getting paid", b:`<ul>
+        <li><b>Payday:</b> bi-weekly, on Fridays.</li>
+        <li><b>Direct deposit:</b> enroll for automatic deposit; otherwise pick up checks by noon on payday or they're mailed.</li>
+        <li><b>Holiday pay:</b> time-and-a-half for hours worked on the 6 observed holidays.</li>
+        <li><b>Benefits eligibility</b> begins after 90 days of full-time employment.</li></ul>
+        <div class="callout">Think your pay is wrong? Report it to Payroll and complete a pay adjustment form — don't wait.</div>`},
+      {h:"Time off & call-offs", b:`<ul>
+        <li><b>Vacation:</b> request at least 15 days ahead (30+ days for 7 or more shifts).</li>
+        <li><b>Personal time:</b> for emergencies — notify your supervisor 8 hours before the shift.</li>
+        <li><b>Calling off:</b> notify your supervisor at least 12 hours before your shift.</li>
+        <li>3+ consecutive sick days require a doctor's note before returning.</li></ul>
+        <div class="callout"><b>Important:</b> a no-call/no-show may be treated as a voluntary resignation.</div>`}
+    ]},
+  { id:"conduct", icon:"🤝", title:"Conduct & Workplace Standards", min:14,
+    desc:"How we treat people, confidentiality, dress code, and conduct.",
+    steps:[
+      {h:"How we work together", b:`<ul>
+        <li>Treat every individual, family member, and coworker with dignity and respect.</li>
+        <li>Support self-determination, choice, and person-centered care.</li>
+        <li>Keep all client information strictly confidential.</li>
+        <li>Follow each individual's service plan (ISP) and complete required training.</li></ul>`},
+      {h:"Things that are never okay", b:`<ul>
+        <li>Working under the influence of alcohol, illegal drugs, or controlled substances.</li>
+        <li>Borrowing money from, or buying from/selling to, an individual (a conflict of interest).</li>
+        <li>Providing paid services to your own spouse or minor child.</li>
+        <li>Sharing client information without a written release.</li>
+        <li>Retaliating against anyone who raises a concern.</li></ul>
+        <div class="callout">Discipline is progressive: verbal warning → written warning → final warning/suspension → termination.</div>`},
+      {h:"Dress code & devices", b:`<ul>
+        <li>Clean, neat clothing free of provocative or obscene images; closed-toe, low-heeled shoes in clients' homes.</li>
+        <li>No see-through clothing or scrubs; knee-length shorts/skirts; no sleeveless tops; pants at the waistline.</li>
+        <li>No personal phone calls on shift except emergencies — step away and keep it brief.</li>
+        <li>Never use a consumer's phone without authorization.</li></ul>`}
+    ]},
+  { id:"role", icon:"⭐", title:"Your Role & Getting Started", min:12,
+    desc:"What success looks like, and the steps to be ready to support individuals.",
+    steps:[
+      {h:"Person-centered support in action", b:`<ul>
+        <li>Know each person's ISP — review and follow it before and during support.</li>
+        <li>Support choice and independence; help individuals build everyday skills.</li>
+        <li>Document accurately and on time, including any incidents.</li>
+        <li>Keep your training and certifications (e.g., CPR/First Aid) current.</li></ul>`},
+      {h:"Before you support anyone", b:`<ul>
+        <li>Complete your profile and onboarding documents in this portal.</li>
+        <li>Pass your background check & Rapback fingerprinting.</li>
+        <li>If you'll drive clients: valid license, insurance, and a clean driving record (under 6 points).</li>
+        <li>Finish all required initial training — required before working with individuals.</li>
+        <li>Review the ISPs for the individuals you'll support.</li></ul>
+        <div class="callout">It's normal to be in learning mode at first. Ask your supervisor anything — that's what they're there for.</div>`}
+    ]}
+];
+/* ===================== COMPLIANCE MODULES (expanded) ===================== */
+const COMPLIANCE = [
+  { id:"hipaa", icon:"🔒", title:"HIPAA & Confidentiality", min:30,
+    desc:"Protecting each person's private and health information.",
+    lessons:[
+      {h:"Why privacy matters", b:`<p>We protect the utmost privacy of every client's personal and health information, consistent with HIPAA and Ohio law. Mishandling it can harm people and carry serious legal consequences — for them and for you.</p>`},
+      {h:"What counts as protected information", b:`<p>Protected information includes far more than a diagnosis:</p><ul>
+        <li>Name, address, phone number, and dates tied to care.</li>
+        <li>Medical, behavioral, and treatment information.</li>
+        <li>Service plans (ISP), notes, and records.</li>
+        <li>Anything that could identify the person and their care.</li></ul>`},
+      {h:"The rules to live by", b:`<ul>
+        <li><b>Minimum necessary:</b> access only the information you need to do your job.</li>
+        <li><b>Keep it out of sight:</b> paperwork must be where others can't read or access it.</li>
+        <li><b>Written release required:</b> never share client info without a written release of information.</li>
+        <li><b>Need-to-know only:</b> share only with those directly involved in the person's care.</li>
+        <li><b>Secure devices:</b> lock screens, protect passwords, never post about clients on social media.</li></ul>`},
+      {h:"It follows you", b:`<div class="callout"><b>Remember:</b> your duty to keep client information confidential continues even after you stop working for Frontline. A breach can lead to discipline, termination, and legal penalties.</div>`}
+    ],
+    quiz:[
+      {q:"A friend asks how one of your clients is doing. You should:", o:["Share a quick update since they care","Not disclose any client information","Share only the diagnosis"], a:1},
+      {q:"You may share a client's information with an outside provider when:", o:["There is a written release of information","They seem trustworthy","It's after business hours"], a:0},
+      {q:"Client paperwork should be:", o:["Left out so staff can find it","Kept out of sight and secure","Posted where the team can see"], a:1},
+      {q:"Your duty to keep client information confidential ends when you stop working here.", o:["True","False"], a:1},
+      {q:"\"Minimum necessary\" means:", o:["Access only the information you need to do your job","Read every client's file","Share everything with the whole team"], a:0},
+      {q:"A coworker posts about a client on Facebook (no full name). This is:", o:["Fine since there's no full name","A privacy violation to report","Allowed for awareness"], a:1},
+      {q:"You find a printed client record left on a desk. You should:", o:["Leave it where it is","Secure it and report if needed","Take it home"], a:1},
+      {q:"Protected health information includes:", o:["Only the diagnosis","Name, address, medical info, and more","Only the Social Security number"], a:1},
+      {q:"Best practice for screens and passwords:", o:["Share passwords for convenience","Lock screens and protect passwords","Leave records visible for speed"], a:1},
+      {q:"You may discuss client details:", o:["In the break room with coworkers","Only with those directly involved in the person's care","Anywhere if you whisper"], a:1}
+    ]},
+  { id:"abuse", icon:"🛡️", title:"Abuse, Neglect & the Abuser Registry", min:30,
+    desc:"Recognizing and reporting abuse, neglect, and exploitation.",
+    lessons:[
+      {h:"Know the categories", b:`<ul>
+        <li><b>Neglect</b> — failing to provide needed care or supervision.</li>
+        <li><b>Physical abuse</b> — causing physical harm.</li>
+        <li><b>Sexual abuse</b> — unlawful sexual conduct or contact.</li>
+        <li><b>Verbal/emotional abuse</b> — threats, humiliation, or intimidation.</li>
+        <li><b>Exploitation/misappropriation</b> — misusing an individual's money or property.</li></ul>`},
+      {h:"Spotting warning signs", b:`<p>Be alert to: unexplained injuries, sudden fear of a person, missing money or property, poor hygiene or unmet needs, withdrawal, or changes in behavior. When something feels wrong, take it seriously.</p>`},
+      {h:"Your duty to report", b:`<p>Every employee must report suspected abuse, neglect, or misappropriation — even when you are not 100% certain. Failure to report can place you on the DODD Abuser Registry and is itself a serious offense.</p>
+        <div class="callout"><b>14-day rule:</b> you must report in writing to Frontline within 14 days if you are ever formally charged with, convicted of, or plead guilty to a disqualifying offense.</div>`},
+      {h:"No retaliation", b:`<p>It is against our principles and the law to retaliate against anyone who reports a concern in good faith. Reporting protects the people we serve — and you.</p>`}
+    ],
+    quiz:[
+      {q:"You suspect a coworker is misusing a client's money. You should:", o:["Wait and see if it happens again","Report it promptly","Only act if the client complains"], a:1},
+      {q:"Failing to report suspected abuse or neglect can result in:", o:["Nothing, if you weren't involved","Being placed on the DODD Abuser Registry","A small bonus deduction"], a:1},
+      {q:"Misusing an individual's funds or property is called:", o:["Neglect","Exploitation / misappropriation","Habilitation"], a:1},
+      {q:"If you're charged with a disqualifying offense, you must tell Frontline in writing within:", o:["14 days","90 days","One year"], a:0},
+      {q:"Neglect is:", o:["Providing too much help","Failing to provide needed care or supervision","Being late once"], a:1},
+      {q:"Yelling threats or humiliating an individual is:", o:["Tough love","Verbal/emotional abuse","Acceptable when frustrated"], a:1},
+      {q:"You should report suspected abuse:", o:["Only if you are 100% certain","When you reasonably suspect it","Only if a supervisor asks"], a:1},
+      {q:"Retaliating against someone who reports a concern is:", o:["Allowed","Prohibited","Encouraged"], a:1},
+      {q:"You witness physical harm to an individual. First you should:", o:["Wait for proof","Ensure the person's safety and report immediately","Confront the coworker privately only"], a:1},
+      {q:"The annual Abuser Registry notice explains:", o:["Your pay rate","Conduct that can place you on the registry","The holiday schedule"], a:1}
+    ]},
+  { id:"mui", icon:"🚨", title:"Incident Reporting (MUI / UI)", min:28,
+    desc:"Major Unusual Incidents and Unusual Incidents — what and when to report.",
+    lessons:[
+      {h:"UI vs. MUI", b:`<p>Frontline reports incidents under DODD rule 5123:2-17-02. An <b>Unusual Incident (UI)</b> is a notable event; a <b>Major Unusual Incident (MUI)</b> is a serious event that can affect a person's health and welfare — for example serious injury, certain medication errors, or alleged abuse/neglect.</p>`},
+      {h:"Acting fast", b:`<ul>
+        <li>Life-threatening event? Call <b>911</b> first, give first aid/CPR if trained, then notify the on-call supervisor.</li>
+        <li>Then notify the guardian/custodial agency and family.</li>
+        <li>Life-threatening incidents require an <b>MUI within 24 hours</b>.</li>
+        <li>Report medication errors immediately.</li></ul>`},
+      {h:"Documenting well", b:`<p>Write down what happened accurately — the circumstances preceding the event, times, who was involved, and what you did. Good documentation protects the individual and supports prevention.</p>
+        <div class="callout">When in doubt about whether something is a UI or MUI, report it and ask your supervisor or administration.</div>`}
+    ],
+    quiz:[
+      {q:"A life-threatening medication error must be documented as an MUI within:", o:["24 hours","7 days","30 days"], a:0},
+      {q:"In a life-threatening emergency your FIRST step is:", o:["Fill out the MUI form","Call 911","Call the family"], a:1},
+      {q:"Incidents are reported under which DODD rule?", o:["5123:2-17-02","HIPAA 164","OSHA 1910"], a:0},
+      {q:"A medication error should be reported:", o:["Only if someone notices","Immediately","At the next staff meeting"], a:1},
+      {q:"MUI stands for:", o:["Minor Unit Issue","Major Unusual Incident","Medical Update Information"], a:1},
+      {q:"Which is most likely an MUI?", o:["A torn worksheet","Alleged abuse, neglect, or serious injury","A late shift"], a:1},
+      {q:"After an incident you should:", o:["Rely on memory later","Document accurately with times and details","Skip documentation"], a:1},
+      {q:"If you're unsure whether an event is a UI or MUI:", o:["Do nothing","Report it and ask your supervisor","Decide alone and forget it"], a:1},
+      {q:"After calling 911 in an emergency, you also notify:", o:["No one until your shift ends","The on-call supervisor (then guardian/agency, family)","A coworker only"], a:1},
+      {q:"Incident logs and prevention plans are:", o:["Thrown away","Reviewed to prevent recurrence","Optional paperwork"], a:1}
+    ]},
+  { id:"rights", icon:"⚖️", title:"Client Rights & Self-Determination", min:26,
+    desc:"The rights of the people we serve, and how we honor them.",
+    lessons:[
+      {h:"A bill of rights", b:`<p>Individuals we serve have rights including, among others:</p><ul>
+        <li>To be treated with courtesy, respect, dignity, and individuality.</li>
+        <li>To a safe, sanitary living environment with privacy and independence.</li>
+        <li>To make decisions that affect their own lives.</li>
+        <li>To manage their personal finances based on their ability.</li>
+        <li>To voice grievances without restraint, coercion, or reprisal.</li>
+        <li>To be free from abuse and from unnecessary restraints.</li>
+        <li>To community participation and relationships of their choosing.</li></ul>
+        <div class="callout">Violating a person's rights can lead to discipline up to and including termination.</div>`},
+      {h:"Self-determination", b:`<p>We support people to plan their own lives and pursue what's important to them. Services are built around each person through person-centered planning and their ISP — not around staff convenience.</p>`},
+      {h:"Honoring choice every day", b:`<p>Offer real choices, respect a person's right to say no, support their preferences, and help them build skills toward independence. Dignity is in the everyday details.</p>`}
+    ],
+    quiz:[
+      {q:"Self-determination means:", o:["Staff decide what's best","Individuals lead decisions about their own lives","The county decides everything"], a:1},
+      {q:"An individual wants to file a grievance. The right response is:", o:["Discourage them","Support them — they have that right without reprisal","Tell them only guardians can"], a:1},
+      {q:"Care and supports should be built around:", o:["A standard routine for everyone","Each individual's person-centered plan (ISP)","Whatever is easiest for staff"], a:1},
+      {q:"Violating a person's rights can lead to termination.", o:["True","False"], a:0},
+      {q:"Individuals have the right to:", o:["No privacy","Privacy and use of personal possessions","Staff control of their belongings"], a:1},
+      {q:"An individual refuses an activity. You should:", o:["Force participation","Respect their right to refuse","Withhold a privilege"], a:1},
+      {q:"Managing personal funds should be:", o:["Always controlled by staff","Based on the individual's ability, supporting independence","Never allowed"], a:1},
+      {q:"Unnecessary restraints are:", o:["Allowed anytime","Not allowed — people have the right to be free from them","Encouraged for safety"], a:1},
+      {q:"Person-centered planning means:", o:["One plan fits all","Services tailored to the individual's goals and preferences","Staff convenience comes first"], a:1},
+      {q:"Individuals have the right to community participation and relationships.", o:["True","False"], a:0}
+    ]},
+  { id:"safety", icon:"➕", title:"Emergency & Medication Safety", min:30,
+    desc:"Emergencies, fire response, and safe medication practices.",
+    lessons:[
+      {h:"Emergencies & who to call", b:`<ul>
+        <li>Life-threatening? Call <b>911</b>, then the on-call supervisor, guardian/custodial agency, and family.</li>
+        <li>Non-life-threatening? Contact the on-call supervisor (then guardian/agency and family).</li>
+        <li>Emergency numbers and evacuation routes are posted at each location — know them.</li></ul>`},
+      {h:"Fire safety", b:`<p>Only attempt to put out a <i>small</i> fire if it's safe to do so. If there's any risk, evacuate, help anyone who needs assistance, call 911 once you're safe, and do not re-enter a burning building.</p>`},
+      {h:"Medication safety", b:`<ul>
+        <li>Follow the MAR (Medication Administration Record) exactly; document accurately and on time.</li>
+        <li>Give medications within the allowed time window; outside it is an error.</li>
+        <li>Report any medication error immediately; serious errors become a UI or MUI.</li>
+        <li>Store medications securely; never give a contaminated or discontinued medication.</li>
+        <li>If you're not trained/certified to give medications, do not administer them.</li></ul>`}
+    ],
+    quiz:[
+      {q:"You may try to extinguish a fire when:", o:["It's small and safe to do so","It's already large","Never — always run"], a:0},
+      {q:"After calling 911 in a life-threatening emergency, you also contact:", o:["Only the family","The on-call supervisor, guardian/agency, and family","No one until your shift ends"], a:1},
+      {q:"A medication given outside its allowed time window is:", o:["Fine if it's close","A medication error to report","Only an issue for controlled meds"], a:1},
+      {q:"The MAR is used to:", o:["Schedule staff","Document medication administration","Track mileage"], a:1},
+      {q:"If you are not trained in CPR during an emergency:", o:["Attempt it anyway","Relinquish to trained staff and call 911","Do nothing and wait"], a:1},
+      {q:"A contaminated or discontinued medication should be:", o:["Given anyway","Not given; report and arrange proper handling","Saved for later"], a:1},
+      {q:"Medications should be stored:", o:["On the counter","In a secure area","In your bag"], a:1},
+      {q:"Emergency numbers and evacuation routes are:", o:["Memorized only","Posted at each location","Not needed"], a:1},
+      {q:"In a non-life-threatening situation you contact:", o:["911 every time","The on-call supervisor","No one"], a:1},
+      {q:"A serious medication error may become:", o:["Nothing","A UI or MUI","A bonus"], a:1}
+    ]}
+];
+
+/* ===================== LIBRARIES & SECURE DOCS ===================== */
+const VIDEOS = [
+  {id:"v_overview", title:"Onboarding Overview", desc:"Big-picture welcome and what your first weeks look like.", url:""},
+  {id:"v_ceo", title:"Welcome from our CEO", desc:"A personal welcome from Millicent Ferguson.", url:""},
+  {id:"v_hipaa", title:"HIPAA & Privacy Basics", desc:"Short refresher on protecting client information.", url:""},
+  {id:"v_mui", title:"Recognizing & Reporting MUIs", desc:"How to spot and report incidents correctly.", url:""},
+  {id:"v_safety", title:"Emergency & Safety Procedures", desc:"What to do when seconds count.", url:""},
+  {id:"v_person", title:"Person-Centered Care", desc:"Supporting self-determination every day.", url:""}
+];
+const DOCUMENTS = [
+  {title:"Employee Handbook", desc:"The full handbook — policies, conduct, pay, and benefits.", url:""},
+  {title:"DODD Policies & Procedures", desc:"Agency policies aligned to Ohio DODD rules.", url:""},
+  {title:"Consumer / Client Rights", desc:"The full bill of rights for the individuals we serve.", url:""},
+  {title:"Grievance Form", desc:"For raising a concern or complaint.", url:""},
+  {title:"Onboarding Slide Deck", desc:"The new-hire onboarding presentation.", url:""}
+];
+/* Documents the employee uploads through the SECURE form (not stored in this page) */
+const SECURE_DOCS = [
+  {t:"DODD Annual Certificate", req:true},
+  {t:"Driver's License", req:true},
+  {t:"Car Insurance (proof of coverage)", req:true},
+  {t:"High School Diploma / GED", req:true},
+  {t:"First Aid / CPR Card", req:true},
+  {t:"Social Security Card", req:true},
+  {t:"BCI / FBI Background Check", req:true},
+  {t:"TB Test Result", req:false},
+  {t:"Physical / Health Screening", req:false},
+  {t:"Voided Check or Direct Deposit Form", req:false},
+  {t:"Signed W-4 & I-9", req:false},
+  {t:"Auto Registration", req:false}
+];
+/* ===================== STATE & STORAGE ===================== */
+const KEY="flh_portal_v2";
+let STATE=load();
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return {}}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(STATE))}catch(e){toast("Heads up","Storage is full — a profile photo may be too large.")}}
+function user(){return STATE.user||null}
+function prof(){STATE.profile=STATE.profile||{};return STATE.profile}
+function prog(){STATE.prog=STATE.prog||{};return STATE.prog}
+const app=document.getElementById('app');
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function findModule(id){return ONBOARDING.find(m=>m.id===id)||COMPLIANCE.find(m=>m.id===id);}
+
+/* ===================== TOAST NOTIFICATIONS ===================== */
+function toast(title,msg){
+  const wrap=document.getElementById('toasts'); if(!wrap)return;
+  const el=document.createElement('div'); el.className='toast';
+  el.innerHTML=`<b>${esc(title)}</b>${esc(msg)}`;
+  wrap.appendChild(el); requestAnimationFrame(()=>el.classList.add('show'));
+  setTimeout(()=>{el.classList.remove('show');setTimeout(()=>el.remove(),300);},4200);
+}
+
+/* ===================== ROUTER ===================== */
+function go(view,arg){STATE._view=[view,arg];save();render();window.scrollTo&&window.scrollTo(0,0);}
+function render(){
+  if(!user()) return renderSignin();
+  const [v,arg]=STATE._view||['dash'];
+  if(v==='module') return renderModule(arg);
+  if(v==='quiz') return renderQuiz(arg);
+  if(v==='cert') return renderCert(arg);
+  if(v==='videos') return renderVideos();
+  if(v==='docs') return renderDocs();
+  if(v==='profile') return renderProfile();
+  if(v==='secure') return renderSecure();
+  if(v==='ack') return renderAck();
+  if(v==='finish') return renderFinish();
+  return renderDash();
+}
+function shell(inner){
+  const u=user();
+  app.innerHTML=`<div class="topbar"><div class="wrap">
+      <div class="brand">Frontline Healthcare<small>Onboarding & Training Portal</small></div>
+      <div class="spacer"></div>
+      <div class="whoami"><b>${esc(u.name)}</b>${esc(u.role)}</div>
+      <button class="linkbtn" onclick="signout()">Sign out</button>
+    </div></div><div class="wrap page">${inner}</div>`;
+}
+
+/* ===================== SIGN-IN (admin code) ===================== */
+function renderSignin(){
+  app.innerHTML=`<div class="signin"><div class="card-signin">
+    <div class="logo-dot">F</div>
+    <h1>Employee Onboarding Portal</h1>
+    <p class="sub">Welcome to Frontline Healthcare. Enter the access code your administrative team gave you to begin.</p>
+    <div class="field"><label>Full name <span class="req">*</span></label><input id="si_name" placeholder="First and last name" autocomplete="name"></div>
+    <div class="field"><label>Your role <span class="req">*</span></label>
+      <select id="si_role">
+        <option>Direct Support Professional (DSP)</option>
+        <option>Supervisor</option>
+        <option>Administrator / Office</option>
+      </select></div>
+    <div class="field"><label>Access code <span class="req">*</span></label><input id="si_code" placeholder="e.g. FLH-ONBOARD"></div>
+    <div id="si_err" style="color:var(--rust);font-size:12.5px;text-align:left;margin:-6px 0 10px;display:none"></div>
+    <button class="btn" onclick="doSignin()">Enter portal &rarr;</button>
+    <p class="fineprint">Access codes are issued by the Frontline administrative team. This page should sit behind your Wix Members login so only employees can reach it. Your progress saves on this device.</p>
+  </div></div>`;
+  const n=document.getElementById('si_name'); if(n) n.focus();
+}
+function doSignin(){
+  const name=(document.getElementById('si_name').value||'').trim();
+  const role=document.getElementById('si_role').value;
+  const code=(document.getElementById('si_code').value||'').trim();
+  const err=document.getElementById('si_err');
+  function fail(m){err.textContent=m;err.style.display='block';}
+  if(!name){return fail("Please enter your full name.");}
+  if(!code){return fail("Please enter the access code from your administrator.");}
+  const codes=CONFIG.validCodes||[];
+  if(codes.length && !codes.map(c=>c.toLowerCase()).includes(code.toLowerCase())){
+    return fail("That access code wasn't recognized. Check with your administrative team.");
+  }
+  STATE.user={name,role,code};save();toast("Welcome, "+name.split(' ')[0]+"!","Let's get your onboarding started.");go('dash');
+}
+function signout(){STATE.user=null;STATE._view=null;save();render();}
+
+/* ===================== PROGRESS HELPERS ===================== */
+function modState(id){const p=prog()[id];if(!p)return 'todo';if(p.passed||p.read)return 'done';if(p.step)return 'prog';return 'todo';}
+function profileComplete(){return !!prof()._complete;}
+function ackComplete(){return !!prog()._ack;}
+function secureComplete(){return !!prog()._secure;}
+function checklist(){
+  const items=[];
+  items.push({k:'profile', label:'Employee profile', done:profileComplete()});
+  ONBOARDING.forEach(m=>items.push({k:'o_'+m.id,label:m.title,done:modState(m.id)==='done'}));
+  COMPLIANCE.forEach(m=>items.push({k:'c_'+m.id,label:m.title,done:!!(prog()[m.id]&&prog()[m.id].passed)}));
+  items.push({k:'ack',label:'Handbook acknowledgment',done:ackComplete()});
+  items.push({k:'secure',label:'Secure documents submitted',done:secureComplete()});
+  return items;
+}
+function overallPct(){const c=checklist();return Math.round(c.filter(i=>i.done).length/c.length*100);}
+function trainingMinutesDone(){
+  let m=0; COMPLIANCE.forEach(x=>{if(prog()[x.id]&&prog()[x.id].passed)m+=x.min;});
+  ONBOARDING.forEach(x=>{if(modState(x.id)==='done')m+=x.min;}); return m;
+}
+function trainingMinutesTotal(){let m=0;[...ONBOARDING,...COMPLIANCE].forEach(x=>m+=x.min);return m;}
+function badge(id,isComp){const st=modState(id);
+  if(st==='done')return `<span class="badge done">✓ ${isComp?'Passed':'Done'}</span>`;
+  if(st==='prog')return `<span class="badge prog">In progress</span>`;
+  return `<span class="badge todo">Not started</span>`;}
+
+/* ===================== DASHBOARD ===================== */
+function renderDash(){
+  const u=user(); const pct=overallPct();
+  const mins=trainingMinutesDone(), tot=trainingMinutesTotal();
+  const hh=(n)=>{const h=Math.floor(n/60),m=n%60;return (h?h+"h ":"")+(m?m+"m":(h?"":"0m"));};
+  const profTile=`<div class="tile prof">${profileComplete()?'<span class="badge done">✓ Complete</span>':'<span class="badge todo">Needs info</span>'}
+      <div class="tile-ic" style="background:var(--amber)">👤</div>
+      <h3>Your employee profile</h3><p>Your details, goals, and photo — required to complete onboarding.</p>
+      <button class="btn ghost sm" onclick="go('profile')">${profileComplete()?'Review / edit':'Start profile'}</button></div>`;
+  const secureTile=`<div class="tile doc">${secureComplete()?'<span class="badge done">✓ Submitted</span>':'<span class="badge todo">Action needed</span>'}
+      <div class="tile-ic" style="background:var(--deep)">🛡️</div>
+      <h3>Secure documents & ID</h3><p>Upload your ID, certifications & sensitive info through our secure form.</p>
+      <button class="btn ghost sm" onclick="go('secure')">Open secure upload</button></div>`;
+  const onb=ONBOARDING.map(m=>`<div class="tile">${badge(m.id,false)}
+      <div class="tile-ic">${m.icon}</div><h3>${esc(m.title)}</h3><p>${esc(m.desc)}</p>
+      <div class="meta">${m.steps.length} screens · ~${m.min} min</div>
+      <button class="btn ghost sm" onclick="go('module','${m.id}')">${modState(m.id)==='done'?'Review':'Start'}</button></div>`).join('');
+  const comp=COMPLIANCE.map(m=>{const p=prog()[m.id]||{};
+    const sc=p.passed?`<div class="meta">Last score: ${p.score}% · ${p.date||''}</div>`:'';
+    return `<div class="tile comp">${badge(m.id,true)}
+      <div class="tile-ic">${m.icon}</div><h3>${esc(m.title)}</h3><p>${esc(m.desc)}</p>
+      <div class="meta">${m.lessons.length} lessons + ${m.quiz.length}-question quiz · ~${m.min} min</div>${sc}
+      <div class="row"><button class="btn ghost sm" onclick="go('module','${m.id}')">${p.passed?'Review':'Start'}</button>
+      ${p.passed?`<button class="btn amber sm" onclick="go('cert','${m.id}')">Certificate</button>`:''}</div></div>`;}).join('');
+  const done=checklist().every(i=>i.done);
+  shell(`
+    <h1 class="hello">Welcome, ${esc(u.name.split(' ')[0])}! <small>— let's complete your onboarding</small></h1>
+    <div class="bar-outer"><div class="bar-inner" style="width:${pct}%"></div></div>
+    <div class="progress-row"><span>Overall onboarding progress</span><span>${pct}% complete</span></div>
+    <div class="statline"><span>Training time completed: <b>${hh(mins)}</b> of ~${hh(tot)}</span><span>Steps done: <b>${checklist().filter(i=>i.done).length}/${checklist().length}</b></span></div>
+
+    <div class="section-title"><span class="ic">👤</span>Step 1 · Your profile & documents</div>
+    <p class="section-sub">Tell us about yourself and submit your onboarding documents securely.</p>
+    <div class="grid">${profTile}${secureTile}
+      <div class="tile"><div class="tile-ic" style="background:var(--deep)">✍️</div><h3>Handbook acknowledgment</h3>
+        <p>Confirm you've read and understand the Employee Handbook.</p>
+        <button class="btn ghost sm" onclick="go('ack')">${ackComplete()?'View':'Sign'}</button></div></div>
+
+    <div class="section-title"><span class="ic">📚</span>Step 2 · Self-onboarding modules</div>
+    <p class="section-sub">Click-through lessons from your Employee Handbook and standards.</p>
+    <div class="grid">${onb}</div>
+
+    <div class="section-title"><span class="ic">✅</span>Step 3 · Annual compliance training & quizzes</div>
+    <p class="section-sub">Pass each quiz at 80% to earn a certificate. Together these count toward your annual training time.</p>
+    <div class="grid">${comp}</div>
+
+    <div class="section-title"><span class="ic">🎬</span>Resources</div>
+    <div class="grid">
+      <div class="tile video"><div class="tile-ic">▶</div><h3>Video library</h3><p>Onboarding & compliance videos.</p>
+        <button class="btn ghost sm" onclick="go('videos')">Open videos</button></div>
+      <div class="tile doc"><div class="tile-ic">📄</div><h3>Document library</h3><p>Handbook, policies, rights & forms.</p>
+        <button class="btn ghost sm" onclick="go('docs')">Open documents</button></div>
+    </div>
+
+    <div class="section-title"><span class="ic">🏁</span>Step 4 · Finish onboarding</div>
+    <p class="section-sub">${done?'Everything is complete — submit to let the onboarding team know!':'Finish the steps above to unlock submission.'}</p>
+    <button class="btn" style="max-width:300px" ${done?'':'disabled'} onclick="go('finish')">Finish & notify onboarding team</button>
+    <div class="note">Admin note: this v1 saves progress in this browser. Sensitive info and uploads go through your secure form (Step 1). To track completion for all staff, pair with your Wix Members area or an LMS later.</div>
+  `);
+}
+/* ===================== MODULE VIEWER ===================== */
+function renderModule(id){
+  const m=findModule(id); if(!m){go('dash');return;}
+  const isComp=!!m.lessons; const steps=isComp?m.lessons:m.steps;
+  const p=prog(); p[id]=p[id]||{}; let i=Math.min(p[id].step||0,steps.length-1);
+  function draw(){
+    const st=steps[i];
+    const dots=steps.map((_,k)=>`<span class="dot ${k<i?'done':''} ${k===i?'active':''}"></span>`).join('');
+    const last=i===steps.length-1;
+    shell(`<button class="backlink" onclick="go('dash')">&larr; Back to dashboard</button>
+      <div class="viewer">
+        <div class="viewer-head"><div class="kick">${isComp?'Compliance training · ~'+m.min+' min':'Onboarding module · ~'+m.min+' min'}</div><h2>${m.icon} ${esc(m.title)}</h2></div>
+        <div class="steps-dots">${dots}</div>
+        <div class="viewer-body"><h3>${esc(st.h)}</h3>${st.b}</div>
+        <div class="viewer-foot"><span class="stepcount">Screen ${i+1} of ${steps.length}</span>
+          <div class="flex">${i>0?`<button class="btn ghost sm" onclick="window._mvPrev()">&larr; Previous</button>`:''}
+            <button class="btn sm" onclick="window._mvNext()">${last?(isComp?'Continue to quiz &rarr;':'Finish module ✓'):'Next &rarr;'}</button></div>
+        </div></div>`);
+  }
+  window._mvPrev=()=>{i=Math.max(0,i-1);p[id].step=i;save();draw();};
+  window._mvNext=()=>{
+    if(i<steps.length-1){i++;p[id].step=i;save();draw();return;}
+    if(isComp){go('quiz',id);} else {p[id].read=true;p[id].step=steps.length-1;save();toast("Module complete","“"+m.title+"” finished.");go('dash');}
+  };
+  draw();
+}
+/* ===================== QUIZ ENGINE ===================== */
+function renderQuiz(id){
+  const m=COMPLIANCE.find(x=>x.id===id); if(!m){go('dash');return;}
+  const answers=new Array(m.quiz.length).fill(null); let submitted=false;
+  function draw(){
+    const qs=m.quiz.map((qq,qi)=>{
+      const opts=qq.o.map((op,oi)=>{let cls='opt';
+        if(submitted){if(oi===qq.a)cls+=' correct';else if(answers[qi]===oi)cls+=' wrong';}
+        else if(answers[qi]===oi)cls+=' sel';
+        return `<label class="${cls}"><input type="radio" name="q${qi}" ${answers[qi]===oi?'checked':''} ${submitted?'disabled':''} onclick="window._pick(${qi},${oi})">${esc(op)}</label>`;
+      }).join('');
+      return `<div class="qblock"><div class="qq">${qi+1}. ${esc(qq.q)}</div>${opts}</div>`;}).join('');
+    shell(`<button class="backlink" onclick="go('module','${id}')">&larr; Back to lesson</button>
+      <div class="viewer"><div class="viewer-head"><div class="kick">Quiz · ${m.quiz.length} questions · pass at 80%</div><h2>${m.icon} ${esc(m.title)} — Quiz</h2></div>
+        <div class="viewer-body">${qs}${submitted?'':'<button class="btn" style="max-width:240px" onclick="window._submit()">Submit answers</button>'}</div></div>`);
+  }
+  window._pick=(qi,oi)=>{answers[qi]=oi;draw();};
+  window._submit=()=>{
+    if(answers.includes(null)){alert('Please answer every question before submitting.');return;}
+    let correct=0; answers.forEach((a,qi)=>{if(a===m.quiz[qi].a)correct++;});
+    const score=Math.round(correct/m.quiz.length*100); const passed=score>=80; submitted=true;
+    const p=prog(); p[id]=p[id]||{};
+    if(passed){p[id].passed=true;p[id].score=score;p[id].date=new Date().toLocaleDateString();toast("Quiz passed 🎉",m.title+" — "+score+"%");}
+    else{p[id].score=score;toast("Almost there",m.title+" — "+score+"%. 80% needed.");}
+    save();
+    const ring=passed?'var(--ok)':'var(--rust)';
+    setTimeout(()=>{const body=app.querySelector('.viewer-body');
+      body.insertAdjacentHTML('afterbegin',`<div class="result"><div class="score-ring" style="background:${ring}">${score}%</div>
+        <h3 style="margin:.1em 0">${passed?'You passed!':'Not quite — review and retry'}</h3>
+        <p style="color:var(--slate)">${correct} of ${m.quiz.length} correct. ${passed?'Your certificate is ready.':'You need 80% to pass.'}</p>
+        <div class="flex" style="justify-content:center">
+          ${passed?`<button class="btn sm" style="width:auto" onclick="go('cert','${id}')">View certificate</button><button class="btn ghost sm" style="width:auto" onclick="go('dash')">Back to dashboard</button>`
+                  :`<button class="btn sm" style="width:auto" onclick="go('quiz','${id}')">Retake quiz</button>`}
+        </div></div>`);
+      window.scrollTo&&window.scrollTo(0,0);},10);
+    draw();
+  };
+  draw();
+}
+/* ===================== CERTIFICATE ===================== */
+function renderCert(id){
+  const m=COMPLIANCE.find(x=>x.id===id); const u=user(); const p=prog()[id]||{};
+  if(!m||!p.passed){go('dash');return;}
+  shell(`<button class="backlink no-print" onclick="go('dash')">&larr; Back to dashboard</button>
+    <div class="cert"><div class="seal">★</div>
+      <p class="muted" style="letter-spacing:1px;text-transform:uppercase">Certificate of Completion</p>
+      <h2>${esc(m.title)}</h2><p class="muted">This certifies that</p>
+      <div class="name">${esc(u.name)}</div>
+      <p class="muted">has successfully completed this Frontline Healthcare compliance training<br>with a score of <b>${p.score}%</b> on ${esc(p.date||'')}.</p>
+      <p class="muted" style="margin-top:18px">Frontline Healthcare LLC · ${esc(u.role)}</p></div>
+    <div class="flex no-print" style="margin-top:16px"><button class="btn sm" style="width:auto" onclick="window.print()">🖨 Print / Save as PDF</button></div>`);
+}
+/* ===================== PROFILE BUILDER ===================== */
+function renderProfile(){
+  const u=user(); const d=prof();
+  const v=(k)=>esc(d[k]||'');
+  shell(`<button class="backlink" onclick="go('dash')">&larr; Back to dashboard</button>
+    <h1 class="hello" style="font-size:23px">Your employee profile</h1>
+    <p class="section-sub">All fields help us complete your onboarding. Sensitive items (SSN, license #, document uploads) are handled separately in <b>Secure documents</b>.</p>
+
+    <div class="formcard"><h3>Photo & basics</h3><p class="fsub">Add a profile photo (optional) and your basic details.</p>
+      <div class="photo-uploader" style="margin-bottom:14px">
+        <div class="avatar" id="av">${d.photo?`<img src="${d.photo}">`:'Photo'}</div>
+        <div><input type="file" accept="image/*" id="pf_photo" onchange="window._photo(event)">
+        <div class="fineprint" style="margin-top:4px">JPG/PNG. Stored on this device only.</div></div></div>
+      <div class="form-grid">
+        <div class="field"><label>First name <span class="req">*</span></label><input id="pf_first" value="${v('first')||esc((u.name.split(' ')[0]||''))}"></div>
+        <div class="field"><label>Last name <span class="req">*</span></label><input id="pf_last" value="${v('last')||esc((u.name.split(' ').slice(1).join(' ')||''))}"></div>
+        <div class="field"><label>Birthday <span class="req">*</span></label><input type="date" id="pf_dob" value="${v('dob')}"></div>
+        <div class="field"><label>Phone <span class="req">*</span></label><input type="tel" id="pf_phone" value="${v('phone')}" placeholder="(614) 555-0123"></div>
+        <div class="field full"><label>Email <span class="req">*</span></label><input type="email" id="pf_email" value="${v('email')}" placeholder="you@email.com"></div>
+        <div class="field full"><label>Street address <span class="req">*</span></label><input id="pf_addr" value="${v('addr')}"></div>
+        <div class="field"><label>City <span class="req">*</span></label><input id="pf_city" value="${v('city')}"></div>
+        <div class="field"><label>State <span class="req">*</span></label><input id="pf_state" value="${v('state')||'OH'}"></div>
+        <div class="field"><label>ZIP <span class="req">*</span></label><input id="pf_zip" value="${v('zip')}"></div>
+      </div></div>
+
+    <div class="formcard"><h3>Get to know you</h3><p class="fsub">A few fun details so your team can welcome you well.</p>
+      <div class="form-grid">
+        <div class="field"><label>Favorite food</label><input id="pf_food" value="${v('food')}"></div>
+        <div class="field"><label>Favorite color</label><input id="pf_color" value="${v('color')}"></div>
+        <div class="field full"><label>Favorite hobbies</label><input id="pf_hobbies" value="${v('hobbies')}"></div>
+      </div></div>
+
+    <div class="formcard"><h3>Your goals</h3><p class="fsub">Where do you see yourself growing — personally and at work?</p>
+      <div class="form-grid">
+        <div class="field"><label>Personal — 1 year</label><textarea id="pf_p1">${v('p1')}</textarea></div>
+        <div class="field"><label>Work — 1 year</label><textarea id="pf_w1">${v('w1')}</textarea></div>
+        <div class="field"><label>Personal — 3 years</label><textarea id="pf_p3">${v('p3')}</textarea></div>
+        <div class="field"><label>Work — 3 years</label><textarea id="pf_w3">${v('w3')}</textarea></div>
+        <div class="field"><label>Personal — 5 years</label><textarea id="pf_p5">${v('p5')}</textarea></div>
+        <div class="field"><label>Work — 5 years</label><textarea id="pf_w5">${v('w5')}</textarea></div>
+      </div></div>
+
+    <div class="formcard"><h3>Sign & date</h3><p class="fsub">By signing, you confirm the information above is accurate.</p>
+      <div class="form-grid">
+        <div class="field"><label>Type your full name to sign <span class="req">*</span></label><input id="pf_sign" value="${v('sign')}" placeholder="Your full name"></div>
+        <div class="field"><label>Date <span class="req">*</span></label><input type="date" id="pf_date" value="${v('date')||new Date().toISOString().slice(0,10)}"></div>
+      </div>
+      <div id="pf_err" style="color:var(--rust);font-size:13px;display:none;margin:4px 0 10px"></div>
+      <button class="btn" style="max-width:260px" onclick="window._saveProfile()">Save profile</button>
+    </div>`);
+  window._photo=(e)=>{const f=e.target.files[0];if(!f)return;
+    if(f.size>1500000){toast("Image too large","Please choose an image under ~1.5 MB.");return;}
+    const r=new FileReader();r.onload=()=>{prof().photo=r.result;save();document.getElementById('av').innerHTML='<img src="'+r.result+'">';};r.readAsDataURL(f);};
+  window._saveProfile=()=>{
+    const g=id=>document.getElementById(id).value.trim();
+    const req={first:'First name',last:'Last name',dob:'Birthday',phone:'Phone',email:'Email',addr:'Address',city:'City',state:'State',zip:'ZIP',sign:'Signature',date:'Date'};
+    const data=Object.assign(prof(),{
+      first:g('pf_first'),last:g('pf_last'),dob:g('pf_dob'),phone:g('pf_phone'),email:g('pf_email'),
+      addr:g('pf_addr'),city:g('pf_city'),state:g('pf_state'),zip:g('pf_zip'),
+      food:g('pf_food'),color:g('pf_color'),hobbies:g('pf_hobbies'),
+      p1:g('pf_p1'),p3:g('pf_p3'),p5:g('pf_p5'),w1:g('pf_w1'),w3:g('pf_w3'),w5:g('pf_w5'),
+      sign:g('pf_sign'),date:g('pf_date')});
+    const missing=Object.keys(req).filter(k=>!data[k]);
+    const err=document.getElementById('pf_err');
+    if(missing.length){err.style.display='block';err.textContent='Please complete: '+missing.map(k=>req[k]).join(', ')+'.';window.scrollTo&&document.body&&window.scrollTo(0,document.body.scrollHeight);return;}
+    data._complete=true;STATE.profile=data;save();toast("Profile saved ✓","Thanks, "+data.first+"! Your profile is complete.");go('dash');
+  };
+}
+/* ===================== SECURE DOCUMENTS ===================== */
+function renderSecure(){
+  const url=CONFIG.secureFormUrl;
+  const list=SECURE_DOCS.map(d=>`<div class="doc-item"><div class="di-ic">📎</div>
+      <div class="di-txt"><b>${esc(d.t)}</b><span>${d.req?'Required':'If applicable'}</span></div>
+      ${d.req?'<span class="pill req">Required</span>':'<span class="pill">Optional</span>'}</div>`).join('');
+  shell(`<button class="backlink" onclick="go('dash')">&larr; Back to dashboard</button>
+    <h1 class="hello" style="font-size:23px">Secure documents & ID</h1>
+    <div class="secure-banner">🔒 <b>Your privacy matters.</b> Sensitive information — your Social Security number, driver's license number, and document uploads — is collected through our <b>secure form</b>, not stored on this page. Please have your documents ready as photos or PDFs.</div>
+    <div class="formcard"><h3>What to submit</h3><p class="fsub">Upload each item in the secure form. Required items must be received before onboarding is finalized.</p>
+      ${list}
+    </div>
+    <div class="formcard"><h3>Submit securely</h3><p class="fsub">This opens Frontline's secure submission form in a new tab.</p>
+      ${url?`<a class="btn" style="max-width:280px;text-decoration:none;text-align:center;display:inline-block" href="${esc(url)}" target="_blank" rel="noopener">Open secure document form &rarr;</a>`
+           :`<button class="btn" style="max-width:320px" disabled>Secure form link not added yet</button>
+             <div class="note">Admin: paste your secure Wix Form (or JotForm/Google Form) link into <b>CONFIG.secureFormUrl</b> in this file. That form is where SSN, license #, and uploads are safely collected.</div>`}
+      <div class="field" style="margin-top:16px;max-width:420px"><label style="display:flex;gap:9px;align-items:flex-start;font-weight:400;color:var(--ink)">
+        <input type="checkbox" id="sec_done" ${secureComplete()?'checked':''} style="width:20px;height:20px;accent-color:var(--teal);margin-top:1px" onclick="window._secureToggle()">
+        <span>I have submitted my required documents through the secure form.</span></label></div>
+    </div>`);
+  window._secureToggle=()=>{const c=document.getElementById('sec_done').checked;prog()._secure=c?{date:new Date().toLocaleString()}:false;save();if(c)toast("Thank you","Documents marked as submitted.");};
+}
+/* ===================== VIDEOS ===================== */
+function videoEmbed(v){
+  if(!v.url) return `<div class="embed-slot">Video coming soon —<br>add a YouTube/Vimeo link for "${esc(v.title)}" in the VIDEOS list.</div>`;
+  return `<div style="position:relative;aspect-ratio:16/9;border-radius:12px;overflow:hidden"><iframe src="${esc(v.url)}" style="position:absolute;inset:0;width:100%;height:100%;border:0" allowfullscreen></iframe></div>`;
+}
+function renderVideos(){
+  const cards=VIDEOS.map(v=>`<div class="tile video"><h3>${esc(v.title)}</h3><p>${esc(v.desc)}</p>${videoEmbed(v)}</div>`).join('');
+  shell(`<button class="backlink" onclick="go('dash')">&larr; Back to dashboard</button>
+    <div class="section-title"><span class="ic">🎬</span>Video library</div>
+    <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(300px,1fr))">${cards}</div>`);
+}
+/* ===================== DOCUMENTS ===================== */
+function renderDocs(){
+  const rows=DOCUMENTS.map(d=>`<div class="tile doc"><div class="tile-ic">📄</div><h3>${esc(d.title)}</h3><p>${esc(d.desc)}</p>
+    ${d.url?`<a class="btn ghost sm" style="text-decoration:none;text-align:center" href="${esc(d.url)}" target="_blank" rel="noopener">Open / download</a>`
+          :`<button class="btn ghost sm" disabled>Link not added yet</button>`}</div>`).join('');
+  shell(`<button class="backlink" onclick="go('dash')">&larr; Back to dashboard</button>
+    <div class="section-title"><span class="ic">📄</span>Document library</div>
+    <div class="grid">${rows}</div>
+    <div class="note">Admin: add each document's link in the DOCUMENTS list (upload to Wix or Google Drive and paste the share links).</div>`);
+}
+/* ===================== ACKNOWLEDGMENT ===================== */
+function renderAck(){
+  const u=user(); const a=prog()._ack;
+  if(a){shell(`<button class="backlink" onclick="go('dash')">&larr; Back to dashboard</button>
+    <div class="viewer"><div class="viewer-head"><div class="kick">Acknowledgment</div><h2>✍️ Handbook acknowledgment</h2></div>
+    <div class="viewer-body"><div class="callout"><b>On file (this device):</b> ${esc(a.name)} acknowledged the Employee Handbook on ${esc(a.date)}.</div></div></div>`);return;}
+  shell(`<button class="backlink" onclick="go('dash')">&larr; Back to dashboard</button>
+    <div class="viewer"><div class="viewer-head"><div class="kick">Acknowledgment</div><h2>✍️ Handbook acknowledgment</h2></div>
+    <div class="viewer-body"><p>Please confirm the following:</p>
+      <div class="callout">I acknowledge that I have received, read, and understand the Frontline Healthcare Employee Handbook, and I agree to follow its policies and standards. I understand the handbook is a guideline and may be updated.</div>
+      <div class="field"><label>Type your full name to sign</label><input id="ack_name" value="${esc(u.name)}"></div>
+      <button class="btn" style="max-width:230px" onclick="window._ackSign()">Sign acknowledgment</button></div></div>`);
+  window._ackSign=()=>{const nm=(document.getElementById('ack_name').value||'').trim();if(!nm)return;prog()._ack={name:nm,date:new Date().toLocaleString()};save();toast("Signed ✓","Handbook acknowledgment recorded.");go('ack');};
+}
+/* ===================== FINISH / COMPLETION PROMPT ===================== */
+function renderFinish(){
+  const u=user();
+  if(!checklist().every(i=>i.done)){go('dash');return;}
+  prog()._finished={date:new Date().toLocaleString()};save();
+  shell(`<div class="modal"><div class="modal-card">
+    <div class="big">✓</div>
+    <h2>You're all set, ${esc(u.name.split(' ')[0])}!</h2>
+    <p>You've completed your onboarding modules, training, profile, and acknowledgments. Everything will be entered into our system, and <b>someone from the Frontline onboarding team will reach out to you shortly</b> to finish the process.</p>
+    <p style="margin-top:10px">Questions in the meantime? Contact us at <b>${esc(CONFIG.onboardingEmail||'')}</b>.</p>
+    <div class="flex" style="justify-content:center;margin-top:18px">
+      <button class="btn sm" style="width:auto" onclick="go('dash')">Back to dashboard</button>
+      <button class="btn ghost sm" style="width:auto" onclick="window.print()">🖨 Print summary</button></div>
+    <p class="fineprint" style="margin-top:14px">Reminder: make sure your required documents are submitted through the secure form.</p>
+  </div></div>`);
+  toast("Onboarding submitted 🎉","The onboarding team has been notified.");
+}
+/* ===================== INIT ===================== */
+render();
+</script>
+</body>
+</html>
