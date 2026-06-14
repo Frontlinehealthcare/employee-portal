@@ -158,80 +158,194 @@ const CONFIG = {
 
 /* ===================== ONBOARDING MODULES ===================== */
 const ONBOARDING = [
-  { id:"welcome", icon:"👋", title:"Welcome & Our Mission", min:12,
-    desc:"Meet Frontline Healthcare, our mission, and our core values.",
+  { id:"welcome", icon:"👋", title:"Welcome, Mission & Your Rights", min:18,
+    desc:"Who we are, what we believe, and the rights that guide our work.",
     steps:[
       {h:"Welcome to the Frontline family", b:`<p>From our Founder & CEO, Millicent Ferguson:</p>
-        <div class="callout"><i>"Welcome to the heart of Frontline Healthcare, where compassion meets purpose, and every team member is seen, valued, and empowered. You belong here! You were chosen because your spirit aligned with something much greater — a mission rooted in love, dignity, and caring."</i></div>
-        <p>You are now part of a team of changemakers, healers, and everyday heroes. Whatever your role, your contribution matters deeply.</p>`},
-      {h:"Our mission", b:`<div class="callout"><b>Mission:</b> "At Frontline Healthcare, we are committed to creating an inclusive and empowering environment where every individual is treated with dignity and compassion. We blend personalized care with both traditional and natural approaches to support the overall well-being of the mind, body, and spirit."</div>
-        <p>We are an Ohio DODD-certified agency supporting individuals with developmental disabilities through person-centered, home and community-based services.</p>`},
-      {h:"Our core values", b:`<p>These are the core values that guide everything we do at Frontline Healthcare:</p><ul>
-        <li><b>Integrity</b> — we hold ourselves to the highest ethical standards, acting with honesty, accountability, and respect in all that we do.</li>
-        <li><b>Inclusive Care</b> — we embrace and celebrate diversity, ensuring our services are accessible, respectful, and empowering to all, especially individuals with developmental disabilities.</li>
-        <li><b>Compassion</b> — we treat every individual with empathy, patience, and genuine care, honoring the humanity in every interaction.</li>
-        <li><b>Holistic Respect</b> — we value both traditional medicine and natural wellness, honoring the unique needs of every individual.</li>
-        <li><b>Collaboration & Community</b> — we believe in the power of teamwork and community partnerships to create lasting change and shared success.</li></ul>`}
+        <div class="callout"><i>"Welcome to the heart of Frontline Healthcare, where compassion meets purpose, and every team member is seen, valued, and empowered. You belong here! You were chosen because your spirit aligned with something much greater — a mission rooted in love, dignity, and caring. Each one of you is a vital thread in this tapestry we're weaving."</i></div>
+        <p>Whatever your role — direct care, administration, or support — your contribution matters deeply. When we serve from the heart, we change lives.</p>`},
+      {h:"Our mission & vision", b:`<div class="callout"><b>Mission:</b> "At Frontline Healthcare, we are committed to creating an inclusive and empowering environment where every individual is treated with dignity and compassion. We blend personalized care with both traditional and natural approaches to support the overall well-being of the mind, body, and spirit."</div>
+        <p>We are an Ohio DODD-certified agency supporting individuals with developmental disabilities, aging adults, and others — through person-centered, home and community-based services. Our vision is to see every individual reach their highest potential and independence.</p>`},
+      {h:"Our core values", b:`<p>These values guide everything we do:</p><ul>
+        <li><b>Integrity</b> — we hold ourselves to the highest ethical standards, acting with honesty, accountability, and respect.</li>
+        <li><b>Inclusive Care</b> — we embrace diversity and make our services accessible, respectful, and empowering to all.</li>
+        <li><b>Compassion</b> — we treat every individual with empathy, patience, and genuine care.</li>
+        <li><b>Holistic Respect</b> — we value both traditional medicine and natural wellness, honoring each person's unique needs.</li>
+        <li><b>Collaboration & Community</b> — we believe in teamwork and partnerships that create lasting change.</li></ul>`},
+      {h:"About this handbook & at-will employment", b:`<p>This portal puts the key parts of your Employee Handbook in one place. The handbook is a guideline that explains how we operate — it is not all-inclusive, and Frontline may change its policies at any time, with notice to employees.</p>
+        <div class="callout"><b>At-will employment:</b> employment with Frontline is not for a fixed term and is by mutual consent. Either you or the agency may end the relationship at any time, with or without cause. Final interpretation of any policy is at the discretion of the CEO.</div>`},
+      {h:"The people we serve: their rights (part 1)", b:`<p>Every individual we support has rights we must protect. These include the right to:</p><ul>
+        <li>Be treated at all times with courtesy, respect, dignity, and individuality.</li>
+        <li>A safe, sanitary living environment that respects privacy and independence.</li>
+        <li>Adequate food, and timely access to medical and dental treatment.</li>
+        <li>Appropriate care in the least intrusive manner.</li>
+        <li>Privacy — both periods of privacy and places of privacy.</li>
+        <li>Communicate freely and own and use personal possessions.</li></ul>`},
+      {h:"The people we serve: their rights (part 2)", b:`<ul>
+        <li>To make decisions that affect their own lives and manage their finances based on their ability.</li>
+        <li>To develop their full potential and pursue vocational opportunities.</li>
+        <li>To be free from emotional, psychological, and physical abuse.</li>
+        <li>To participate in education, training, social development, and recreation.</li>
+        <li>To voice grievances and recommend changes without restraint, coercion, discrimination, or reprisal.</li>
+        <li>To be free from unnecessary chemical or physical restraints.</li>
+        <li>To confidential treatment of all personal and medical records.</li></ul>
+        <div class="callout"><b>This is serious:</b> violating any resident's rights leads to immediate disciplinary action, up to and including termination.</div>`},
+      {h:"Your rights as staff", b:`<p>You have rights too. If, due to a conflict with your ethics, cultural values, or religious or personal beliefs, you wish not to participate in an aspect of a consumer's care, you may request not to — and Frontline will make a reasonable effort to approve it, as long as it doesn't harm the consumer's care or violate their rights.</p>
+        <ul>
+        <li><b>Equal employment:</b> Frontline complies with affirmative action laws. If you feel you weren't treated equally, contact Human Resources to file a complaint.</li>
+        <li><b>Disabilities (ADA):</b> we reasonably accommodate qualified individuals with disabilities so they can perform their essential job duties.</li></ul>`},
+      {h:"Your eligibility to work", b:`<p>In compliance with the Immigration Reform and Control Act, every new employee must complete <b>Form I-9</b> and present documents establishing identity and eligibility to work in the United States — this is a condition of employment.</p>
+        <p>You'll handle these documents during onboarding. If you have questions about what to bring, ask Human Resources.</p>`}
     ]},
-  { id:"working", icon:"🗓️", title:"Pay, Schedule & Time Off", min:14,
-    desc:"Schedules, timekeeping, payday, attendance, and requesting time off.",
+
+  { id:"working", icon:"🗓️", title:"Pay, Schedule, Benefits & Time Off", min:24,
+    desc:"Employment status, schedules, pay, time off, leaves, and leaving well.",
     steps:[
-      {h:"Your schedule & timekeeping", b:`<ul>
-        <li>Work your scheduled hours — coverage keeps the people we serve safe.</li>
-        <li>Arrive at least 5 minutes before your shift; arriving 3+ minutes late counts as tardy.</li>
-        <li>Record arrival and departure accurately on your timesheet — never falsify times.</li>
-        <li>You may switch shifts only with a signed, supervisor-approved alternative-shift agreement.</li></ul>`},
+      {h:"Employment categories", b:`<p>Your category determines your status and benefits eligibility:</p><ul>
+        <li><b>Full-time:</b> signed a schedule agreement for 38+ hours per week.</li>
+        <li><b>Part-time:</b> signed a schedule agreement for 37 hours or less.</li>
+        <li><b>Seasonal:</b> interim or temporary staffing support — not eligible for benefits.</li>
+        <li><b>PRN:</b> work "as needed," minimum 8 hours/month. Not picking up an 8-hour shift within 30 days is treated as a voluntary resignation. Not eligible for benefits.</li>
+        <li><b>Independent contractors/consultants</b> are not employees and control their own methods and schedules.</li></ul>`},
+      {h:"Benefits eligibility & performance reviews", b:`<ul>
+        <li><b>Benefits eligibility</b> begins after 90 days of continuous full-time employment.</li>
+        <li>Full-time staff who don't work their signed schedule may be changed to part-time and lose benefits eligibility.</li>
+        <li>To change your status, talk to HR and sign a new shift agreement.</li></ul>
+        <div class="callout"><b>Performance reviews:</b> new hires (and anyone promoted/transferred) have a 90-day probationary period ending in a review. Reviews continue quarterly, where goals are set and progress is discussed.</div>`},
+      {h:"Your schedule & shift switches", b:`<p>You're assigned a fixed schedule at a specific site, but you may be asked to work other sites based on staffing needs. Failing to comply can lead to discipline up to termination.</p>
+        <p><b>Need to switch a shift?</b> All three must happen:</p><ul>
+        <li>The switch falls within the same pay period (check with your supervisor).</li>
+        <li>An alternative-shift agreement is completed and signed by both staff.</li>
+        <li>Your supervisor is notified, signs it, and turns it in to the Program Director.</li></ul>
+        <p>Unauthorized switches can lead to corrective action; repeated violations to termination.</p>`},
+      {h:"Timekeeping & timesheets", b:`<ul>
+        <li>Accurately record your arrival and departure times on your timesheet.</li>
+        <li>Any correction or change must include an explanation.</li>
+        <li>Tampering with shift start/end times is falsification of documentation and is disciplined accordingly.</li></ul>`},
       {h:"Getting paid", b:`<ul>
         <li><b>Payday:</b> bi-weekly, on Fridays.</li>
-        <li><b>Direct deposit:</b> enroll for automatic deposit; otherwise pick up checks by noon on payday or they're mailed.</li>
-        <li><b>Holiday pay:</b> time-and-a-half for hours worked on the 6 observed holidays.</li>
-        <li><b>Benefits eligibility</b> begins after 90 days of full-time employment.</li></ul>
-        <div class="callout">Think your pay is wrong? Report it to Payroll and complete a pay adjustment form — don't wait.</div>`},
-      {h:"Time off & call-offs", b:`<ul>
-        <li><b>Vacation:</b> request at least 15 days ahead (30+ days for 7 or more shifts).</li>
-        <li><b>Personal time:</b> for emergencies — notify your supervisor 8 hours before the shift.</li>
-        <li><b>Calling off:</b> notify your supervisor at least 12 hours before your shift.</li>
-        <li>3+ consecutive sick days require a doctor's note before returning.</li></ul>
-        <div class="callout"><b>Important:</b> a no-call/no-show may be treated as a voluntary resignation.</div>`}
+        <li><b>Direct deposit:</b> enroll for automatic deposit. Otherwise, pick up your check at the office by noon on payday, or it's mailed home. You can enroll any time through HR.</li>
+        <li><b>Paid less than expected?</b> Report it to Payroll and complete a pay-adjustment form; an investigation follows. Errors are corrected (sometimes the next pay period if documents were late).</li>
+        <li><b>Paid more than expected?</b> You must report it — failing to do so can lead to corrective action.</li></ul>`},
+      {h:"Holiday pay", b:`<p>Nonexempt employees earn <b>time-and-a-half</b> for hours worked on Frontline's observed holidays (those hours also count toward overtime):</p>
+        <ul><li>New Year's Day</li><li>Memorial Day</li><li>Independence Day</li><li>Labor Day</li><li>Thanksgiving Day</li><li>Christmas Day</li></ul>`},
+      {h:"Personal time & vacation", b:`<p><b>Personal time</b> (full-time staff): earn 1.85 hours each pay period you work at least 76 hours — up to 40 hours/year, capped at 48 hours. Use it for emergencies (notify your supervisor 8 hours before the shift) and approved purposes.</p>
+        <p><b>Vacation</b> (full-time staff), added on your anniversary date:</p><ul>
+        <li>40 hours after 1 year</li><li>40 hours after 2 years</li><li>80 hours after 3 years</li></ul>
+        <p>Accrual is capped at 240 hours. Request vacation at least <b>15 days</b> ahead (<b>30 days</b> for 7+ shifts). If a request is denied, you're still expected to work — a no-show may lead to termination.</p>`},
+      {h:"Calling off & attendance", b:`<ul>
+        <li><b>Calling off:</b> notify your supervisor at least <b>12 hours</b> before your shift, or you can't use paid personal time to cover it.</li>
+        <li>Arrive at least <b>5 minutes early</b>; arriving 3+ minutes after start is <b>late</b>.</li>
+        <li>A one-day absence with no notice is treated as a <b>voluntary resignation</b>.</li>
+        <li>3+ consecutive sick days require a doctor's note before returning.</li>
+        <li>Leaving before your shift ends without notifying your supervisor is treated as a voluntary resignation.</li></ul>`},
+      {h:"Leaves of absence", b:`<ul>
+        <li><b>FMLA:</b> eligible employees (12+ months, 1,250 hours) may take up to 12 weeks for birth/adoption, a family member's serious health condition, or your own. Apply through HR as soon as you know.</li>
+        <li><b>Personal leave:</b> for those who don't qualify for FMLA — request in writing at least 30 days ahead; granted case-by-case.</li>
+        <li><b>Military leave (USERRA):</b> your position is protected when you serve; notify HR.</li>
+        <li><b>Bereavement:</b> 3 days unpaid (or use personal/vacation time) for an immediate family member. Documentation may be requested.</li>
+        <li><b>Jury duty:</b> notify your supervisor right away; you may use accrued time for pay with proof of service.</li></ul>`},
+      {h:"Changes, leaving & benefits continuation", b:`<ul>
+        <li><b>Info changes:</b> tell HR about changes to your name, marital status, dependents, address, emergency contacts, or phone.</li>
+        <li><b>Resigning:</b> give your supervisor 3 weeks' written notice (date, effective date, reason) and work through it to be paid out accrued vacation (if employed full-time 1+ year).</li>
+        <li><b>Return of property:</b> return all Frontline property in good condition upon request or separation.</li>
+        <li><b>COBRA</b> lets you continue medical/dental/vision coverage after a qualifying event (at your cost). <b>Workers' comp</b> covers job-related injury — report any injury to your supervisor and HR and file an incident report within 24 hours.</li></ul>`}
     ]},
-  { id:"conduct", icon:"🤝", title:"Conduct & Workplace Standards", min:14,
-    desc:"How we treat people, confidentiality, dress code, and conduct.",
+
+  { id:"conduct", icon:"🤝", title:"Conduct & Workplace Standards", min:18,
+    desc:"How we treat people, present ourselves, and stay accountable.",
     steps:[
       {h:"How we work together", b:`<ul>
         <li>Treat every individual, family member, and coworker with dignity and respect.</li>
         <li>Support self-determination, choice, and person-centered care.</li>
-        <li>Keep all client information strictly confidential.</li>
-        <li>Follow each individual's service plan (ISP) and complete required training.</li></ul>`},
-      {h:"Things that are never okay", b:`<ul>
-        <li>Working under the influence of alcohol, illegal drugs, or controlled substances.</li>
-        <li>Borrowing money from, or buying from/selling to, an individual (a conflict of interest).</li>
-        <li>Providing paid services to your own spouse or minor child.</li>
-        <li>Sharing client information without a written release.</li>
-        <li>Retaliating against anyone who raises a concern.</li></ul>
-        <div class="callout">Discipline is progressive: verbal warning → written warning → final warning/suspension → termination.</div>`},
-      {h:"Dress code & devices", b:`<ul>
-        <li>Clean, neat clothing free of provocative or obscene images; closed-toe, low-heeled shoes in clients' homes.</li>
-        <li>No see-through clothing or scrubs; knee-length shorts/skirts; no sleeveless tops; pants at the waistline.</li>
-        <li>No personal phone calls on shift except emergencies — step away and keep it brief.</li>
-        <li>Never use a consumer's phone without authorization.</li></ul>`}
+        <li>Protect each person's privacy and rights at all times.</li>
+        <li>Follow each individual's service plan (ISP) and complete required training.</li>
+        <li>Speak up — raising a concern in good faith is always protected.</li></ul>`},
+      {h:"Dress code & hygiene", b:`<p>Your appearance reflects the agency in the community. Maintain a neat, clean appearance:</p><ul>
+        <li>Clean clothing free of provocative or obscene writing/pictures; not excessively baggy or tight.</li>
+        <li>No see-through clothing or scrubs. Shorts, skirts, and dresses at knee level.</li>
+        <li>No sleeveless tops or sleepwear; pants worn at the waistline.</li>
+        <li>Avoid loose/dangling jewelry (safety). Only closed-toe, low-heeled shoes in consumers' homes.</li></ul>
+        <p>Not following this can mean removal from shift (unpaid) and corrective action.</p>`},
+      {h:"Phones & electronic devices", b:`<ul>
+        <li>No personal phone calls while on shift — emergency calls only, with caution.</li>
+        <li>Keep emergency calls limited and short; step away from consumers and coworkers.</li>
+        <li>Never use a consumer's phone without authorization — charges for unauthorized calls are billed to you, and misuse can lead to criminal prosecution.</li></ul>`},
+      {h:"Drug-free workplace", b:`<p>Frontline has a <b>zero-tolerance</b> policy for controlled substances and alcohol abuse. There's no pre-employment drug test, but testing is done randomly and when:</p><ul>
+        <li><b>Reasonable suspicion</b> — suspected of being under the influence or using on duty.</li>
+        <li><b>Post-accident</b> — after a vehicle accident on duty.</li></ul>
+        <div class="callout">Refusing a test or tampering with a sample results in termination. Testing positive for illegal drugs at any time results in automatic termination. Never report to or remain on duty under the influence.</div>`},
+      {h:"Smoke-free workplace & visitors", b:`<ul>
+        <li><b>Smoke-free:</b> zero tolerance for smoking on any Frontline premises — violations lead to corrective action up to termination.</li>
+        <li><b>Visitors:</b> personal visitors are not permitted at work. Anyone in a consumer's home needs prior authorization; drop-ins are forbidden. Former staff need HR authorization to be on premises.</li>
+        <li>Report any guest misconduct to your supervisor immediately; call police if a visitor threatens a consumer's safety.</li></ul>`},
+      {h:"Documentation", b:`<p>Accurate documentation is vital. You must monitor the consumers and record their daily progress on the tracking log — every shift, accurately, and on time.</p>
+        <div class="callout">If your supervisor flags a documentation issue, fix it by the end of that day. Failing to document accurately or on time is a misconduct subject to corrective action up to termination.</div>`},
+      {h:"Harassment prevention", b:`<p>Harassment of any kind is not permitted on any Frontline premises. Harassment is unwelcome conduct based on gender, sexual preference, race, color, religion, national origin, age, disability, or veteran status that interferes with someone's work.</p>
+        <ul>
+        <li>Verbal, physical, or visual conduct that is intimidating, hostile, offensive, or abusive is prohibited.</li>
+        <li>If you witness or experience questionable conduct, you have a duty to report it to Human Resources.</li>
+        <li>Knowingly making false accusations is also subject to discipline.</li></ul>`},
+      {h:"What counts as misconduct", b:`<p>Misconduct can lead to corrective action up to termination — sometimes on the first offense. Examples include:</p><ul>
+        <li>Violating a consumer's rights or alone-time policy; sleeping on duty during direct-care hours.</li>
+        <li>Unauthorized relationships with or gifts from consumers; not following a consumer's plan.</li>
+        <li>Unauthorized use of agency vehicles or transporting consumers without authorization.</li>
+        <li>Missing mandatory training or letting a license/certification lapse; failing to report a conviction.</li>
+        <li>Theft or damage, weapons, illegal substances, or being impaired on duty.</li>
+        <li>Falsifying records, breaching confidentiality, insubordination, or neglect of duty.</li></ul>
+        <p>This list isn't exhaustive — discipline depends on severity and history.</p>`},
+      {h:"Discipline, retraining & suspension", b:`<p>Counseling and discipline are progressive steps to correct behavior:</p>
+        <ul><li>1) Verbal warning</li><li>2) Written warning</li><li>3) Final warning</li><li>4) Termination</li></ul>
+        <p><b>Retraining</b> may be used to guide you on a minor issue before it becomes misconduct. Depending on severity, a step may be skipped.</p>
+        <div class="callout"><b>Suspension / inactive status</b> isn't standalone discipline — it can be used pending an investigation, at the request of an MUI unit or law enforcement, or when required certifications/insurance lapse. You stay inactive until given written permission to return.</div>`}
     ]},
-  { id:"role", icon:"⭐", title:"Your Role & Getting Started", min:12,
-    desc:"What success looks like, and the steps to be ready to support individuals.",
+
+  { id:"role", icon:"⭐", title:"Your Role, Safety & Getting Started", min:18,
+    desc:"Person-centered support, privacy, safety, and your first steps.",
     steps:[
       {h:"Person-centered support in action", b:`<ul>
         <li>Know each person's ISP — review and follow it before and during support.</li>
         <li>Support choice and independence; help individuals build everyday skills.</li>
         <li>Document accurately and on time, including any incidents.</li>
-        <li>Keep your training and certifications (e.g., CPR/First Aid) current.</li></ul>`},
-      {h:"Before you support anyone", b:`<ul>
-        <li>Complete your profile and onboarding documents in this portal.</li>
-        <li>Pass your background check & Rapback fingerprinting.</li>
-        <li>If you'll drive clients: valid license, insurance, and a clean driving record (under 6 points).</li>
-        <li>Finish all required initial training — required before working with individuals.</li>
-        <li>Review the ISPs for the individuals you'll support.</li></ul>
-        <div class="callout">It's normal to be in learning mode at first. Ask your supervisor anything — that's what they're there for.</div>`}
+        <li>Keep your training and certifications current (e.g., CPR/First Aid, license).</li></ul>`},
+      {h:"Confidentiality & HIPAA", b:`<p>Safeguarding information is vital. Frontline follows HIPAA and must protect consumers' and employees' Protected Health Information (PHI).</p><ul>
+        <li>Don't discuss a consumer's PHI outside work, or with staff not involved in their care.</li>
+        <li>Confidential info includes demographics, medical info, home address, phone number, and pay/benefits data.</li>
+        <li>Keep records secure and out of sight; never post about consumers on social media.</li></ul>
+        <div class="callout">Any disclosure of PHI to an unauthorized party violates HIPAA and agency policy — and can lead to termination. Your duty of confidentiality continues even after you leave.</div>`},
+      {h:"Recognizing & reporting abuse (MUI/UI)", b:`<p>A <b>Major Unusual Incident (MUI)</b> is any alleged, suspected, or actual event that adversely affects an individual's health and safety. It requires immediate action to protect the person, an investigation, and a prevention plan. An <b>Unusual Incident (UI)</b> is off-routine but not a major health/safety risk.</p>
+        <p>You are a <b>mandated reporter</b>. Report immediately if you suspect:</p>
+        <ul><li>Neglect</li><li>Physical abuse</li><li>Sexual abuse</li><li>Verbal abuse</li><li>Exploitation / misappropriation</li></ul>
+        <div class="callout">Failing to report any of these leads to corrective action or termination.</div>`},
+      {h:"Background checks & reporting convictions", b:`<ul>
+        <li>All employees authorize criminal background checks (Ohio BCI and other agencies). Certain convictions may disqualify employment per state rule 5123:2-3-06 — HR can share the list of disqualifying offenses.</li>
+        <li>If you're convicted of any criminal activity while employed, you must notify HR in writing within <b>10 working days</b>. Not reporting it can lead to dismissal.</li></ul>`},
+      {h:"Health screening (TB & Hepatitis B)", b:`<ul>
+        <li>New employees may complete a two-step <b>TB screening</b> within their first 30 days. A medical exemption needs a physician's note; a negative chest x-ray (if required) is at the employee's cost.</li>
+        <li><b>Hepatitis B</b> immunization is optional and free; you can request it later through HR.</li>
+        <li>If you don't complete required testing through your own fault, you're responsible for the cost to retake it.</li></ul>`},
+      {h:"Training requirements", b:`<p>Training keeps everyone safe and is a condition of employment:</p><ul>
+        <li>Complete <b>orientation training before</b> beginning work at any site.</li>
+        <li>Complete all relevant trainings within <b>15 days</b> after orientation.</li>
+        <li>Maintain current certifications by attending all scheduled trainings.</li></ul>
+        <p>Failing to keep training/certifications current can lead to corrective action up to termination.</p>`},
+      {h:"Driving & transportation safety", b:`<p>If you transport individuals:</p><ul>
+        <li>Hold a valid Ohio driver's license with a suitable record, and maintain valid auto insurance at all times (submit proof to HR before employment).</li>
+        <li>Notify HR immediately of any moving violation, accident, or license suspension.</li>
+        <li>Never use a phone or device while driving — pull over safely if you must call.</li>
+        <li>Inspect agency vehicles before use and report any defect to your supervisor; use them for official business only.</li></ul>
+        <div class="callout"><b>In an accident:</b> call police and get a report, seek medical help if needed, notify your supervisor from the scene, and complete an Unusual/Employee Incident Report. You can't return to work until post-accident steps (including a drug test) are done.</div>`},
+      {h:"Before you start: your checklist", b:`<p>To be ready to support individuals, make sure you've:</p><ul>
+        <li>Completed your profile and submitted onboarding documents securely.</li>
+        <li>Passed your background check and provided I-9 documents.</li>
+        <li>Provided license, insurance, and a clean driving record (if you'll drive).</li>
+        <li>Finished orientation and all required initial training.</li>
+        <li>Current CPR/First Aid (if your role requires it) and reviewed the ISPs for those you'll support.</li>
+        <li>Signed the handbook acknowledgment.</li></ul>
+        <div class="callout">It's normal to be in learning mode at first — ask your supervisor anything. That's exactly what they're there for.</div>`}
     ]}
 ];
+
 /* ===================== COMPLIANCE MODULES (expanded) ===================== */
 const COMPLIANCE = [
   { id:"hipaa", icon:"🔒", title:"HIPAA & Confidentiality", min:30,
