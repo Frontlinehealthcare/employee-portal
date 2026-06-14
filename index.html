@@ -548,6 +548,7 @@ function render(){
   if(v==='profile') return renderProfile();
   if(v==='secure') return renderSecure();
   if(v==='ack') return renderAck();
+  if(v==='nda') return renderNda();
   if(v==='finish') return renderFinish();
   return renderDash();
 }
@@ -601,6 +602,7 @@ function signout(){STATE.user=null;STATE._view=null;save();render();}
 function modState(id){const p=prog()[id];if(!p)return 'todo';if(p.passed||p.read)return 'done';if(p.step)return 'prog';return 'todo';}
 function profileComplete(){return !!prof()._complete;}
 function ackComplete(){return !!prog()._ack;}
+function ndaComplete(){return !!prog()._nda;}
 function secureComplete(){return !!prog()._secure;}
 function checklist(){
   const items=[];
@@ -608,6 +610,7 @@ function checklist(){
   ONBOARDING.forEach(m=>items.push({k:'o_'+m.id,label:m.title,done:modState(m.id)==='done'}));
   COMPLIANCE.forEach(m=>items.push({k:'c_'+m.id,label:m.title,done:!!(prog()[m.id]&&prog()[m.id].passed)}));
   items.push({k:'ack',label:'Handbook acknowledgment',done:ackComplete()});
+  items.push({k:'nda',label:'Confidentiality & NDA agreement',done:ndaComplete()});
   items.push({k:'secure',label:'Secure documents submitted',done:secureComplete()});
   return items;
 }
@@ -658,7 +661,10 @@ function renderDash(){
     <div class="grid">${profTile}${secureTile}
       <div class="tile"><div class="tile-ic" style="background:var(--deep)">✍️</div><h3>Handbook acknowledgment</h3>
         <p>Confirm you've read and understand the Employee Handbook.</p>
-        <button class="btn ghost sm" onclick="go('ack')">${ackComplete()?'View':'Sign'}</button></div></div>
+        <button class="btn ghost sm" onclick="go('ack')">${ackComplete()?'View':'Sign'}</button></div>
+      <div class="tile"><div class="tile-ic" style="background:var(--rust)">🔒</div><h3>Confidentiality & NDA</h3>
+        <p>Read and sign the confidentiality & no-document-removal agreement.</p>
+        <button class="btn ghost sm" onclick="go('nda')">${ndaComplete()?'View':'Read & sign'}</button></div></div>
 
     <div class="section-title"><span class="ic">📚</span>Step 2 · Self-onboarding modules</div>
     <p class="section-sub">Click-through lessons from your Employee Handbook and standards.</p>
@@ -884,6 +890,38 @@ function renderAck(){
       <div class="field"><label>Type your full name to sign</label><input id="ack_name" value="${esc(u.name)}"></div>
       <button class="btn" style="max-width:230px" onclick="window._ackSign()">Sign acknowledgment</button></div></div>`);
   window._ackSign=()=>{const nm=(document.getElementById('ack_name').value||'').trim();if(!nm)return;prog()._ack={name:nm,date:new Date().toLocaleString()};save();toast("Signed ✓","Handbook acknowledgment recorded.");go('ack');};
+}
+/* ===================== CONFIDENTIALITY & NDA ===================== */
+function renderNda(){
+  const u=user(); const a=prog()._nda;
+  if(a){shell(`<button class="backlink" onclick="go('dash')">&larr; Back to dashboard</button>
+    <div class="viewer"><div class="viewer-head"><div class="kick">Acknowledgment</div><h2>🔒 Confidentiality & NDA</h2></div>
+    <div class="viewer-body"><div class="callout"><b>On file (this device):</b> ${esc(a.name)} signed the Confidentiality & Non-Disclosure Agreement on ${esc(a.date)}.</div></div></div>`);return;}
+  const agreement = `
+    <p style="margin:.1em 0 .4em"><b>FRONTLINE HEALTHCARE LLC</b><br>Confidentiality & Non-Disclosure Agreement <span style="color:var(--slate)">(including agreement not to remove company documents)</span></p>
+    <p>As an employee of Frontline Healthcare LLC ("Frontline"), I understand that I will have access to confidential and protected information about the individuals we serve, their families, my coworkers, and the agency's business. I agree to the following:</p>
+    <p><b>1. Protected & confidential information.</b> I will keep strictly confidential all Protected Health Information (PHI) and personal information about the individuals we serve — including names, addresses, phone numbers, medical, behavioral, and financial information, service plans (ISPs), and records — consistent with HIPAA and Ohio law. I will also keep confidential the agency's business information, including its policies, procedures, forms, personnel data, and operational methods.</p>
+    <p><b>2. Use only as needed.</b> I will access and use confidential information only as necessary to perform my job ("minimum necessary"), and will share it only with those directly involved in an individual's care or as authorized in writing.</p>
+    <p><b>3. No disclosure.</b> I will not disclose confidential information to any unauthorized person, and will not discuss the individuals we serve outside of work or on social media. This obligation continues after my employment ends.</p>
+    <p><b>4. No removal of documents or property.</b> I will not copy, photograph, download, email, remove, or otherwise take any agency documents, records, files, forms, policies and procedures, or other materials or property from Frontline — in physical or electronic form — except as required to perform my job and as authorized by the agency. All such materials remain the sole property of Frontline.</p>
+    <p><b>5. Return of materials.</b> Upon request or at the end of my employment, I will immediately return all agency documents, records, devices, keys, and property in my possession, and will not keep copies.</p>
+    <p><b>6. Reporting.</b> I will promptly report any suspected breach of confidentiality or loss of agency information to my supervisor or Human Resources.</p>
+    <p><b>7. Consequences.</b> I understand that violating this agreement may result in disciplinary action up to and including termination, and may carry legal and financial consequences, including under HIPAA and Ohio law.</p>`;
+  shell(`<button class="backlink" onclick="go('dash')">&larr; Back to dashboard</button>
+    <div class="viewer"><div class="viewer-head"><div class="kick">Acknowledgment</div><h2>🔒 Confidentiality & Non-Disclosure Agreement</h2></div>
+    <div class="viewer-body">
+      <p>Please read this agreement carefully, then check the box and sign at the bottom.</p>
+      <div class="callout" style="max-height:300px;overflow:auto;font-size:13.5px;line-height:1.5">${agreement}</div>
+      <div class="field" style="margin-top:6px"><label style="display:flex;gap:9px;align-items:flex-start;font-weight:400;color:var(--ink)">
+        <input type="checkbox" id="nda_agree" style="width:20px;height:20px;accent-color:var(--teal);margin-top:1px">
+        <span>I have read, understand, and agree to this Confidentiality & Non-Disclosure Agreement.</span></label></div>
+      <div class="field"><label>Type your full name to sign</label><input id="nda_name" value="${esc(u.name)}"></div>
+      <button class="btn" style="max-width:240px" onclick="window._ndaSign()">Sign agreement</button></div></div>`);
+  window._ndaSign=()=>{
+    if(!document.getElementById('nda_agree').checked){alert('Please check the box to confirm you have read and agree.');return;}
+    const nm=(document.getElementById('nda_name').value||'').trim(); if(!nm){return;}
+    prog()._nda={name:nm,date:new Date().toLocaleString()};save();toast("Signed ✓","Confidentiality agreement recorded.");go('nda');
+  };
 }
 /* ===================== FINISH / COMPLETION PROMPT ===================== */
 function renderFinish(){
