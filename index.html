@@ -518,7 +518,27 @@ const SECURE_DOCS = [
 const KEY="flh_portal_v2";
 let STATE=load();
 function load(){try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return {}}}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(STATE))}catch(e){toast("Heads up","Storage is full — a profile photo may be too large.")}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(STATE))}catch(e){toast("Heads up","Storage is full — a profile photo may be too large.")} cloudSave();}
+/* ===================== CLOUD SYNC (Wix Velo bridge) =====================
+   Backward-compatible: still saves to localStorage. When the portal is embedded
+   inside the Wix page (which runs the matching Velo code), progress also syncs
+   to the signed-in member's record so it follows them across devices. If no Velo
+   listener is present (direct link, old embed), these messages are simply ignored. */
+var CLOUD={embedded:(window.parent&&window.parent!==window),got:false,tries:0};
+function cloudPost(type,extra){if(!CLOUD.embedded)return;try{window.parent.postMessage(Object.assign({type:type},extra||{}),'*');}catch(e){}}
+function cloudSave(){if(!CLOUD.embedded)return;if(cloudSave._t)clearTimeout(cloudSave._t);cloudSave._t=setTimeout(function(){cloudPost('FLH_SAVE_STATE',{state:STATE});},400);}
+function cloudHello(){if(CLOUD.got||CLOUD.tries>6||!CLOUD.embedded)return;CLOUD.tries++;cloudPost('FLH_READY');setTimeout(cloudHello,800);}
+window.addEventListener('message',function(e){
+  var d=e.data;if(!d||typeof d!=='object'||!d.type||String(d.type).indexOf('FLH_')!==0)return;
+  if(d.type==='FLH_LOAD_STATE'){
+    CLOUD.got=true;
+    if(d.state&&typeof d.state==='object'&&Object.keys(d.state).length){
+      STATE=d.state;try{localStorage.setItem(KEY,JSON.stringify(STATE));}catch(_){}
+      try{render();}catch(_){}
+    } else { if(STATE&&Object.keys(STATE).length)cloudPost('FLH_SAVE_STATE',{state:STATE}); }
+  }
+});
+cloudHello();
 function user(){return STATE.user||null}
 function prof(){STATE.profile=STATE.profile||{};return STATE.profile}
 function prog(){STATE.prog=STATE.prog||{};return STATE.prog}
