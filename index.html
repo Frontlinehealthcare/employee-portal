@@ -901,11 +901,30 @@ function renderApplication(){
     <h1 class="hello" style="font-size:23px">Frontline Healthcare Application</h1>
     <p class="section-sub">Please complete your employment application. This complements your profile; sensitive items (SSN, license #) are handled in <b>Secure documents</b>.</p>
 
+    <div class="formcard"><h3>Applicant information</h3>
+      <div class="form-grid">
+        <div class="field"><label>First name <span class="req">*</span></label><input id="ap_first" value="${v('first')||esc(prof().first||u.name.split(' ')[0]||'')}"></div>
+        <div class="field"><label>Last name <span class="req">*</span></label><input id="ap_last" value="${v('last')||esc(prof().last||u.name.split(' ').slice(1).join(' ')||'')}"></div>
+        <div class="field full"><label>Street address</label><input id="ap_addr" value="${v('addr')||esc(prof().addr||'')}"></div>
+        <div class="field"><label>City</label><input id="ap_city" value="${v('city')||esc(prof().city||'')}"></div>
+        <div class="field"><label>State</label><input id="ap_state" value="${v('state')||esc(prof().state||'OH')}"></div>
+        <div class="field"><label>ZIP</label><input id="ap_zip" value="${v('zip')||esc(prof().zip||'')}"></div>
+        <div class="field"><label>Phone <span class="req">*</span></label><input type="tel" id="ap_phone" value="${v('phone')||esc(prof().phone||'')}"></div>
+        <div class="field"><label>Email <span class="req">*</span></label><input type="email" id="ap_email" value="${v('email')||esc(prof().email||'')}"></div>
+      </div></div>
+
     <div class="formcard"><h3>Position</h3>
       <div class="form-grid">
         <div class="field"><label>Position applied for <span class="req">*</span></label><input id="ap_pos" value="${v('pos')}" placeholder="e.g. Direct Support Professional"></div>
         <div class="field"><label>Date available to start</label><input type="date" id="ap_avail" value="${v('avail')}"></div>
       </div></div>
+
+    <div class="formcard"><h3>Work eligibility</h3>
+      ${yn('e1','elig18','Are you at least 18 years of age?',true)}
+      ${yn('e2','eligwork','Are you legally authorized to work in the United States?',true)}
+      ${yn('e3','eligdl','Do you have a valid driver\'s license?',false)}
+      ${yn('e4','eligtrans','Do you have reliable transportation?',false)}
+    </div>
 
     <div class="section-title" style="margin-top:10px"><span class="ic">💼</span>Employment history — last 3 employers</div>
     <p class="section-sub">Start with your most recent employer.</p>
@@ -933,11 +952,13 @@ function renderApplication(){
     const g=id=>{const el=document.getElementById(id);return el?el.value.trim():'';};
     const rad=name=>{const el=document.querySelector('input[name="'+name+'"]:checked');return el?el.value:'';};
     const data=Object.assign(appl(),{
+      first:g('ap_first'),last:g('ap_last'),addr:g('ap_addr'),city:g('ap_city'),state:g('ap_state'),zip:g('ap_zip'),phone:g('ap_phone'),email:g('ap_email'),
+      elig18:rad('e1'),eligwork:rad('e2'),eligdl:rad('e3'),eligtrans:rad('e4'),
       pos:g('ap_pos'),avail:g('ap_avail'),
       dodd1:rad('d1'),dodd1exp:g('ap_d1exp'),dodd2:rad('d2'),dodd3:rad('d3'),
       skills:g('ap_skills'),sign:g('ap_sign'),date:g('ap_date')});
     [1,2,3].forEach(n=>{['name','title','phone','from','to','reason','contact'].forEach(f=>{data['emp'+n+'_'+f]=g('emp'+n+'_'+f);});});
-    const req={pos:'Position applied for',emp1_name:'Employer 1 name',dodd1:'DODD question 1',dodd2:'DODD question 2',dodd3:'DODD question 3',sign:'Signature',date:'Date'};
+    const req={first:'First name',last:'Last name',phone:'Phone',email:'Email',elig18:'Age (18+) question',eligwork:'Work authorization question',pos:'Position applied for',emp1_name:'Employer 1 name',dodd1:'DODD question 1',dodd2:'DODD question 2',dodd3:'DODD question 3',sign:'Signature',date:'Date'};
     const missing=Object.keys(req).filter(k=>!data[k]);
     const err=document.getElementById('ap_err');
     if(missing.length){err.style.display='block';err.textContent='Please complete: '+missing.map(k=>req[k]).join(', ')+'.';window.scrollTo(0,document.body.scrollHeight);return;}
