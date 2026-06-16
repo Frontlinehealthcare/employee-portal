@@ -542,6 +542,7 @@ cloudHello();
 function user(){return STATE.user||null}
 function prof(){STATE.profile=STATE.profile||{};return STATE.profile}
 function prog(){STATE.prog=STATE.prog||{};return STATE.prog}
+function appl(){STATE.application=STATE.application||{};return STATE.application;}
 const app=document.getElementById('app');
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function findModule(id){return ONBOARDING.find(m=>m.id===id)||COMPLIANCE.find(m=>m.id===id);}
@@ -566,6 +567,7 @@ function render(){
   if(v==='videos') return renderVideos();
   if(v==='docs') return renderDocs();
   if(v==='profile') return renderProfile();
+  if(v==='application') return renderApplication();
   if(v==='secure') return renderSecure();
   if(v==='ack') return renderAck();
   if(v==='nda') return renderNda();
@@ -623,6 +625,7 @@ function signout(){STATE.user=null;STATE._view=null;save();render();}
 /* ===================== PROGRESS HELPERS ===================== */
 function modState(id){const p=prog()[id];if(!p)return 'todo';if(p.passed||p.read)return 'done';if(p.step)return 'prog';return 'todo';}
 function profileComplete(){return !!prof()._complete;}
+function applicationComplete(){return !!appl()._complete;}
 function ackComplete(){return !!prog()._ack;}
 function ndaComplete(){return !!prog()._nda;}
 function attestComplete(){return !!prog()._attest;}
@@ -631,6 +634,7 @@ function secureComplete(){return !!prog()._secure;}
 function checklist(){
   const items=[];
   items.push({k:'profile', label:'Employee profile', done:profileComplete()});
+  items.push({k:'application', label:'Employment application', done:applicationComplete()});
   ONBOARDING.forEach(m=>items.push({k:'o_'+m.id,label:m.title,done:modState(m.id)==='done'}));
   COMPLIANCE.forEach(m=>items.push({k:'c_'+m.id,label:m.title,done:!!(prog()[m.id]&&prog()[m.id].passed)}));
   items.push({k:'ack',label:'Handbook acknowledgment',done:ackComplete()});
@@ -660,6 +664,10 @@ function renderDash(){
       <div class="tile-ic" style="background:var(--amber)">👤</div>
       <h3>Your employee profile</h3><p>Your details, goals, and photo — required to complete onboarding.</p>
       <button class="btn ghost sm" onclick="go('profile')">${profileComplete()?'Review / edit':'Start profile'}</button></div>`;
+  const appTile=`<div class="tile">${applicationComplete()?'<span class="badge done">✓ Complete</span>':'<span class="badge todo">Needs info</span>'}
+      <div class="tile-ic" style="background:var(--teal)">📝</div>
+      <h3>Frontline Healthcare application</h3><p>Your employment application — work history, DODD eligibility, and skills.</p>
+      <button class="btn ghost sm" onclick="go('application')">${applicationComplete()?'Review / edit':'Start application'}</button></div>`;
   const secureTile=`<div class="tile doc">${secureComplete()?'<span class="badge done">✓ Submitted</span>':'<span class="badge todo">Action needed</span>'}
       <div class="tile-ic" style="background:var(--deep)">🛡️</div>
       <h3>Secure documents & ID</h3><p>Upload your ID, certifications & sensitive info through our secure form.</p>
@@ -684,7 +692,7 @@ function renderDash(){
 
     <div class="section-title"><span class="ic">👤</span>Step 1 · Your profile & documents</div>
     <p class="section-sub">Tell us about yourself and submit your onboarding documents securely.</p>
-    <div class="grid">${profTile}${secureTile}
+    <div class="grid">${profTile}${appTile}${secureTile}
       <div class="tile"><div class="tile-ic" style="background:var(--deep)">✍️</div><h3>Handbook acknowledgment</h3>
         <p>Confirm you've read and understand the Employee Handbook.</p>
         <button class="btn ghost sm" onclick="go('ack')">${ackComplete()?'View':'Sign'}</button></div>
@@ -864,6 +872,76 @@ function renderProfile(){
     const err=document.getElementById('pf_err');
     if(missing.length){err.style.display='block';err.textContent='Please complete: '+missing.map(k=>req[k]).join(', ')+'.';window.scrollTo&&document.body&&window.scrollTo(0,document.body.scrollHeight);return;}
     data._complete=true;STATE.profile=data;save();toast("Profile saved ✓","Thanks, "+data.first+"! Your profile is complete.");go('dash');
+  };
+}
+/* ===================== EMPLOYMENT APPLICATION ===================== */
+function renderApplication(){
+  const u=user(); const d=appl();
+  const v=(k)=>esc(d[k]||'');
+  const sel=(k,val)=>d[k]===val?'checked':'';
+  const empBlock=(n)=>`
+    <div class="formcard"><h3>Employer ${n}${n===1?' (most recent)':''}${n===1?' <span class="req">*</span>':''}</h3>
+      <div class="form-grid">
+        <div class="field full"><label>Employer name${n===1?' <span class="req">*</span>':''}</label><input id="emp${n}_name" value="${v('emp'+n+'_name')}"></div>
+        <div class="field"><label>Job title</label><input id="emp${n}_title" value="${v('emp'+n+'_title')}"></div>
+        <div class="field"><label>Phone</label><input id="emp${n}_phone" value="${v('emp'+n+'_phone')}"></div>
+        <div class="field"><label>From (mo/yr)</label><input id="emp${n}_from" value="${v('emp'+n+'_from')}" placeholder="e.g. 03/2022"></div>
+        <div class="field"><label>To (mo/yr)</label><input id="emp${n}_to" value="${v('emp'+n+'_to')}" placeholder="e.g. 05/2024 or Present"></div>
+        <div class="field full"><label>Reason for leaving</label><input id="emp${n}_reason" value="${v('emp'+n+'_reason')}"></div>
+        <div class="field"><label>May we contact this employer?</label>
+          <select id="emp${n}_contact"><option ${d['emp'+n+'_contact']==='Yes'?'selected':''}>Yes</option><option ${d['emp'+n+'_contact']==='No'?'selected':''}>No</option></select></div>
+      </div></div>`;
+  const yn=(name,key,question,req)=>`
+    <div class="field full" style="margin-bottom:10px"><label>${question}${req?' <span class="req">*</span>':''}</label>
+      <div style="display:flex;gap:22px;margin-top:5px">
+        <label style="display:flex;gap:6px;align-items:center;font-weight:400;color:var(--ink)"><input type="radio" name="${name}" value="Yes" ${sel(key,'Yes')} style="width:16px;height:16px;accent-color:var(--teal)"> Yes</label>
+        <label style="display:flex;gap:6px;align-items:center;font-weight:400;color:var(--ink)"><input type="radio" name="${name}" value="No" ${sel(key,'No')} style="width:16px;height:16px;accent-color:var(--teal)"> No</label>
+      </div></div>`;
+  shell(`<button class="backlink" onclick="go('dash')">&larr; Back to dashboard</button>
+    <h1 class="hello" style="font-size:23px">Frontline Healthcare Application</h1>
+    <p class="section-sub">Please complete your employment application. This complements your profile; sensitive items (SSN, license #) are handled in <b>Secure documents</b>.</p>
+
+    <div class="formcard"><h3>Position</h3>
+      <div class="form-grid">
+        <div class="field"><label>Position applied for <span class="req">*</span></label><input id="ap_pos" value="${v('pos')}" placeholder="e.g. Direct Support Professional"></div>
+        <div class="field"><label>Date available to start</label><input type="date" id="ap_avail" value="${v('avail')}"></div>
+      </div></div>
+
+    <div class="section-title" style="margin-top:10px"><span class="ic">💼</span>Employment history — last 3 employers</div>
+    <p class="section-sub">Start with your most recent employer.</p>
+    ${empBlock(1)}${empBlock(2)}${empBlock(3)}
+
+    <div class="formcard"><h3>DODD eligibility questions</h3><p class="fsub">Required by Ohio DODD. Your answers are reviewed together with your background check.</p>
+      ${yn('d1','dodd1','Have you ever been convicted of, pleaded guilty to, or been found eligible for intervention in lieu of conviction for any disqualifying offense under Ohio DODD rule 5123-2-02?',true)}
+      <div class="field full" style="margin-bottom:10px"><label>If yes, please explain</label><textarea id="ap_d1exp">${v('dodd1exp')}</textarea></div>
+      ${yn('d2','dodd2','Are you currently listed on the DODD Abuser Registry, the Nurse Aide Registry (with a finding), or any state or federal exclusion or offender registry?',true)}
+      ${yn('d3','dodd3','Do you consent to the criminal background check (Ohio BCI&amp;I and the FBI where applicable) and fingerprint (Rapback) enrollment required by DODD?',true)}
+    </div>
+
+    <div class="formcard"><h3>Skills & qualifications</h3><p class="fsub">List any relevant skills, certifications, training, or experience.</p>
+      <div class="form-grid"><div class="field full"><label>Skills, certifications & experience</label><textarea id="ap_skills" style="min-height:95px" placeholder="e.g. CPR/First Aid certified, medication administration, MUI/incident-reporting training, experience supporting individuals with developmental disabilities...">${v('skills')}</textarea></div></div></div>
+
+    <div class="formcard"><h3>Sign & date</h3><p class="fsub">By signing, I certify the information in this application is true and complete to the best of my knowledge.</p>
+      <div class="form-grid">
+        <div class="field"><label>Type your full name to sign <span class="req">*</span></label><input id="ap_sign" value="${v('sign')}" placeholder="Your full name"></div>
+        <div class="field"><label>Date <span class="req">*</span></label><input type="date" id="ap_date" value="${v('date')||new Date().toISOString().slice(0,10)}"></div>
+      </div>
+      <div id="ap_err" style="color:var(--rust);font-size:13px;display:none;margin:4px 0 10px"></div>
+      <button class="btn" style="max-width:260px" onclick="window._saveAppl()">Save application</button>
+    </div>`);
+  window._saveAppl=()=>{
+    const g=id=>{const el=document.getElementById(id);return el?el.value.trim():'';};
+    const rad=name=>{const el=document.querySelector('input[name="'+name+'"]:checked');return el?el.value:'';};
+    const data=Object.assign(appl(),{
+      pos:g('ap_pos'),avail:g('ap_avail'),
+      dodd1:rad('d1'),dodd1exp:g('ap_d1exp'),dodd2:rad('d2'),dodd3:rad('d3'),
+      skills:g('ap_skills'),sign:g('ap_sign'),date:g('ap_date')});
+    [1,2,3].forEach(n=>{['name','title','phone','from','to','reason','contact'].forEach(f=>{data['emp'+n+'_'+f]=g('emp'+n+'_'+f);});});
+    const req={pos:'Position applied for',emp1_name:'Employer 1 name',dodd1:'DODD question 1',dodd2:'DODD question 2',dodd3:'DODD question 3',sign:'Signature',date:'Date'};
+    const missing=Object.keys(req).filter(k=>!data[k]);
+    const err=document.getElementById('ap_err');
+    if(missing.length){err.style.display='block';err.textContent='Please complete: '+missing.map(k=>req[k]).join(', ')+'.';window.scrollTo(0,document.body.scrollHeight);return;}
+    data._complete=true;STATE.application=data;save();toast("Application saved ✓","Your application is complete.");go('dash');
   };
 }
 /* ===================== SECURE DOCUMENTS ===================== */
