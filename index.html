@@ -569,6 +569,7 @@ function render(){
   if(v==='secure') return renderSecure();
   if(v==='ack') return renderAck();
   if(v==='nda') return renderNda();
+  if(v==='attest') return renderAttest();
   if(v==='finish') return renderFinish();
   return renderDash();
 }
@@ -623,6 +624,7 @@ function modState(id){const p=prog()[id];if(!p)return 'todo';if(p.passed||p.read
 function profileComplete(){return !!prof()._complete;}
 function ackComplete(){return !!prog()._ack;}
 function ndaComplete(){return !!prog()._nda;}
+function attestComplete(){return !!prog()._attest;}
 function secureComplete(){return !!prog()._secure;}
 function checklist(){
   const items=[];
@@ -631,6 +633,7 @@ function checklist(){
   COMPLIANCE.forEach(m=>items.push({k:'c_'+m.id,label:m.title,done:!!(prog()[m.id]&&prog()[m.id].passed)}));
   items.push({k:'ack',label:'Handbook acknowledgment',done:ackComplete()});
   items.push({k:'nda',label:'Confidentiality & NDA agreement',done:ndaComplete()});
+  items.push({k:'attest',label:'DODD background-check attestation',done:attestComplete()});
   items.push({k:'secure',label:'Secure documents submitted',done:secureComplete()});
   return items;
 }
@@ -684,7 +687,10 @@ function renderDash(){
         <button class="btn ghost sm" onclick="go('ack')">${ackComplete()?'View':'Sign'}</button></div>
       <div class="tile"><div class="tile-ic" style="background:var(--rust)">🔒</div><h3>Confidentiality & NDA</h3>
         <p>Read and sign the confidentiality & no-document-removal agreement.</p>
-        <button class="btn ghost sm" onclick="go('nda')">${ndaComplete()?'View':'Read & sign'}</button></div></div>
+        <button class="btn ghost sm" onclick="go('nda')">${ndaComplete()?'View':'Read & sign'}</button></div>
+      <div class="tile"><div class="tile-ic" style="background:var(--teal)">📋</div><h3>Background check attestation</h3>
+        <p>Review the DODD disqualifying offenses and attest, pending your background check.</p>
+        <button class="btn ghost sm" onclick="go('attest')">${attestComplete()?'View':'Read & sign'}</button></div></div>
 
     <div class="section-title"><span class="ic">📚</span>Step 2 · Self-onboarding modules</div>
     <p class="section-sub">Click-through lessons from your Employee Handbook and standards.</p>
@@ -941,6 +947,46 @@ function renderNda(){
     if(!document.getElementById('nda_agree').checked){alert('Please check the box to confirm you have read and agree.');return;}
     const nm=(document.getElementById('nda_name').value||'').trim(); if(!nm){return;}
     prog()._nda={name:nm,date:new Date().toLocaleString()};save();toast("Signed ✓","Confidentiality agreement recorded.");go('nda');
+  };
+}
+/* ===================== DODD BACKGROUND-CHECK ATTESTATION ===================== */
+function renderAttest(){
+  const u=user(); const a=prog()._attest;
+  if(a){shell(`<button class="backlink" onclick="go('dash')">&larr; Back to dashboard</button>
+    <div class="viewer"><div class="viewer-head"><div class="kick">Attestation</div><h2>📋 Background check attestation</h2></div>
+    <div class="viewer-body"><div class="callout"><b>On file (this device):</b> ${esc(a.name)} signed the DODD background-check attestation on ${esc(a.date)}.</div></div></div>`);return;}
+  const offenses = `
+    <p style="margin:.1em 0 .5em"><b>FRONTLINE HEALTHCARE LLC</b><br>Background Check Attestation <span style="color:var(--slate)">(Ohio DODD &mdash; Ohio Administrative Code 5123-2-02)</span></p>
+    <p>Before I may be employed in a direct services position, Ohio law (OAC 5123-2-02) requires Frontline Healthcare to obtain a criminal records check (Ohio BCI&amp;I, and the FBI where applicable) and requires me to attest that I have not been convicted of, pleaded guilty to, or been found eligible for intervention in lieu of conviction for a "disqualifying offense." The disqualifying offenses are listed below by tier. Please review them carefully before signing.</p>
+    <p><b>Tier 1 &mdash; Permanent exclusion.</b> Ohio Revised Code sections: 2903.01 aggravated murder; 2903.02 murder; 2903.03 voluntary manslaughter; 2903.11 felonious assault; 2903.15 permitting child abuse; 2903.16 failing to provide for a functionally impaired person; 2903.34 patient abuse/neglect; 2903.341 patient endangerment; 2905.01 kidnapping; 2905.02 abduction; 2905.32 trafficking in persons; 2905.33 unlawful conduct with respect to documents; 2907.02 rape; 2907.03 sexual battery; 2907.04 unlawful sexual conduct with a minor; 2907.05 gross sexual imposition; 2907.06 sexual imposition; 2907.07 importuning; 2907.08 voyeurism; 2907.12 felonious sexual penetration; 2907.31 disseminating matter harmful to juveniles; 2907.32 pandering obscenity; 2907.321 / 2907.322 / 2907.323 pandering or use of a minor or impaired person in obscene or nudity-oriented material; 2909.22 / 2909.23 / 2909.24 terrorism-related offenses; 2913.40 Medicaid fraud; conspiracy, attempt, or complicity (2923.01 / 2923.02 / 2923.03) to commit any of the above; fraud, theft, embezzlement, or other financial misconduct involving a federal- or state-funded program; and any substantially equivalent offense under other law.</p>
+    <p><b>Tier 2 &mdash; Ten-year exclusion</b> (10 years from full discharge from imprisonment, probation, and parole): 2903.04 involuntary manslaughter; 2903.041 reckless homicide; 2905.04 child stealing (former); 2905.05 criminal child enticement; 2905.11 extortion; 2907.21 compelling prostitution; 2907.22 promoting prostitution; 2907.23 enticement/solicitation to patronize a prostitute; 2909.02 aggravated arson; 2909.03 arson; 2911.01 aggravated robbery; 2911.11 aggravated burglary; 2913.46 illegal use of SNAP/WIC benefits; 2913.48 workers' compensation fraud; 2913.49 identity fraud; 2917.02 aggravated riot; 2923.12 / 2923.122 / 2923.123 / 2923.13 / 2923.161 / 2923.162 / 2923.21 weapons offenses; 2923.32 engaging in a pattern of corrupt activity; 2923.42 participating in a criminal gang; 2925.02 corrupting another with drugs; 2925.03 trafficking in drugs; 2925.04 / 2925.041 illegal manufacture of drugs or chemicals; 3716.11 placing harmful objects in food; conspiracy/attempt/complicity to commit any of the above; and any substantially equivalent offense.</p>
+    <p><b>Tier 3 &mdash; Seven-year exclusion</b> (7 years from full discharge): 959.13 / 959.131 cruelty to animals or companion animals; 2903.12 aggravated assault; 2903.21 aggravated menacing; 2903.211 menacing by stalking; 2905.12 coercion; 2909.04 disrupting public services; 2911.02 robbery; 2911.12 burglary; 2913.47 insurance fraud; 2917.01 inciting to violence; 2917.03 riot; 2917.31 inducing panic; 2919.22 endangering children; 2919.25 domestic violence; 2921.03 intimidation; 2921.11 perjury; 2921.13 falsification; 2921.34 escape; 2921.35 aiding escape; 2921.36 illegal conveyance into a detention facility; 2925.05 funding of drug trafficking; 2925.06 illegal distribution of anabolic steroids; 2925.24 tampering with drugs; 2927.12 ethnic intimidation; conspiracy/attempt/complicity to commit any of the above; and any substantially equivalent offense.</p>
+    <p><b>Tier 4 &mdash; Five-year exclusion</b> (5 years from full discharge): 2903.13 assault; 2903.22 menacing; 2907.09 public indecency; 2907.24 soliciting; 2907.25 prostitution; 2907.33 deception to obtain matter harmful to juveniles; 2911.13 breaking and entering; 2913.02 theft; 2913.03 unauthorized use of a vehicle; 2913.04 unauthorized use of property; 2913.05 telecommunications fraud; 2913.11 passing bad checks; 2913.21 misuse of credit cards; 2913.31 forgery; 2913.32 criminal simulation; 2913.41 defrauding a rental agency or hostelry; 2913.42 tampering with records; 2913.43 securing writings by deception; 2913.44 personating an officer; 2913.441 unlawful display of a law-enforcement emblem; 2913.45 defrauding creditors; 2913.51 receiving stolen property; 2919.12 / 2919.121 / 2919.123 / 2919.124 unlawful abortion offenses; 2919.23 interference with custody; 2919.24 contributing to the unruliness or delinquency of a child; 2921.12 tampering with evidence; 2921.21 compounding a crime; 2921.24 disclosure of confidential information; 2921.32 obstructing justice; 2921.321 harming a police dog/horse or service dog; 2921.51 impersonating a peace officer; 2925.09 dangerous-drug offenses involving livestock; 2925.11 possession of controlled substances (other than a minor drug-possession offense); 2925.13 permitting drug abuse; 2925.22 deception to obtain a dangerous drug; 2925.23 illegal processing of drug documents; 2925.36 illegal dispensing of drug samples; 2925.55 / 2925.56 unlawful purchase or sale of pseudoephedrine or ephedrine; conspiracy/attempt/complicity to commit any of the above; and any substantially equivalent offense.</p>
+    <p><b>Tier 5 &mdash; No exclusion.</b> 2925.11 possession of controlled substances and 2925.14 illegal use or possession of drug paraphernalia (and substantially equivalent offenses) do not, by themselves, preclude employment.</p>
+    <p style="color:var(--slate);font-size:12.5px">Note: Multiple disqualifying offenses can extend the exclusion period. Certain exceptions apply (for example, an unconditional pardon, an overturned conviction, or a valid Certificate of Qualification for Employment for non-Tier 1 offenses). This is a summary for your review; the full rule (OAC 5123-2-02) and the Ohio Revised Code control.</p>`;
+  const statements = `
+    <p style="margin-top:.6em">By signing below, I attest and agree as follows:</p>
+    <p><b>1.</b> I have <b>not</b> been convicted of, pleaded guilty to, or been found eligible for intervention in lieu of conviction for any disqualifying offense listed above.</p>
+    <p><b>2.</b> I will disclose to Frontline any conviction for an offense that has been sealed.</p>
+    <p><b>3.</b> I agree to notify Frontline in writing within fourteen (14) calendar days if, while employed, I am formally charged with, convicted of, plead guilty to, or am found eligible for intervention in lieu of conviction for a disqualifying offense. I understand failure to do so may result in termination.</p>
+    <p><b>4.</b> I understand any employment offered before my completed criminal records check is received is <b>conditional</b>, and that my employment will end immediately if a disqualifying offense is identified, or by the sixty-first (61st) day if the check has not yet been received.</p>
+    <p><b>5.</b> The information I have provided is true and complete to the best of my knowledge.</p>`;
+  shell(`<button class="backlink" onclick="go('dash')">&larr; Back to dashboard</button>
+    <div class="viewer"><div class="viewer-head"><div class="kick">Attestation</div><h2>📋 Background Check Attestation (Ohio DODD)</h2></div>
+    <div class="viewer-body">
+      <p>Please read the disqualifying offenses and the statements below, then check the box and sign.</p>
+      <div class="callout" style="max-height:320px;overflow:auto;font-size:13px;line-height:1.5">${offenses}${statements}</div>
+      <div class="field" style="margin-top:6px"><label style="display:flex;gap:9px;align-items:flex-start;font-weight:400;color:var(--ink)">
+        <input type="checkbox" id="att_agree" style="width:20px;height:20px;accent-color:var(--teal);margin-top:1px">
+        <span>I have read the list of disqualifying offenses above. The statements I am attesting to are true, and I agree to the notification requirement.</span></label></div>
+      <div class="field"><label>Type your full name to sign</label><input id="att_name" value="${esc(u.name)}"></div>
+      <button class="btn" style="max-width:240px" onclick="window._attSign()">Sign attestation</button>
+      <p class="fineprint">This attestation reflects Ohio DODD rule 5123-2-02. Frontline recommends final review by its compliance officer or attorney before official use.</p>
+    </div></div>`);
+  window._attSign=()=>{
+    if(!document.getElementById('att_agree').checked){alert('Please check the box to confirm your attestation.');return;}
+    const nm=(document.getElementById('att_name').value||'').trim(); if(!nm){return;}
+    prog()._attest={name:nm,date:new Date().toLocaleString()};save();toast("Signed ✓","Background check attestation recorded.");go('attest');
   };
 }
 /* ===================== FINISH / COMPLETION PROMPT ===================== */
