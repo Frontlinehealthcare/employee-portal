@@ -570,6 +570,7 @@ function render(){
   if(v==='ack') return renderAck();
   if(v==='nda') return renderNda();
   if(v==='attest') return renderAttest();
+  if(v==='media') return renderMedia();
   if(v==='finish') return renderFinish();
   return renderDash();
 }
@@ -625,6 +626,7 @@ function profileComplete(){return !!prof()._complete;}
 function ackComplete(){return !!prog()._ack;}
 function ndaComplete(){return !!prog()._nda;}
 function attestComplete(){return !!prog()._attest;}
+function mediaComplete(){return !!prog()._media;}
 function secureComplete(){return !!prog()._secure;}
 function checklist(){
   const items=[];
@@ -634,6 +636,7 @@ function checklist(){
   items.push({k:'ack',label:'Handbook acknowledgment',done:ackComplete()});
   items.push({k:'nda',label:'Confidentiality & NDA agreement',done:ndaComplete()});
   items.push({k:'attest',label:'DODD background-check attestation',done:attestComplete()});
+  items.push({k:'media',label:'Media & photo consent',done:mediaComplete()});
   items.push({k:'secure',label:'Secure documents submitted',done:secureComplete()});
   return items;
 }
@@ -690,7 +693,10 @@ function renderDash(){
         <button class="btn ghost sm" onclick="go('nda')">${ndaComplete()?'View':'Read & sign'}</button></div>
       <div class="tile"><div class="tile-ic" style="background:var(--teal)">📋</div><h3>Background check attestation</h3>
         <p>Review the DODD disqualifying offenses and attest, pending your background check.</p>
-        <button class="btn ghost sm" onclick="go('attest')">${attestComplete()?'View':'Read & sign'}</button></div></div>
+        <button class="btn ghost sm" onclick="go('attest')">${attestComplete()?'View':'Read & sign'}</button></div>
+      <div class="tile"><div class="tile-ic" style="background:var(--amber)">📷</div><h3>Media & photo consent</h3>
+        <p>Choose whether we may use your photo or likeness in agency materials.</p>
+        <button class="btn ghost sm" onclick="go('media')">${mediaComplete()?'View':'Review & choose'}</button></div></div>
 
     <div class="section-title"><span class="ic">📚</span>Step 2 · Self-onboarding modules</div>
     <p class="section-sub">Click-through lessons from your Employee Handbook and standards.</p>
@@ -981,12 +987,50 @@ function renderAttest(){
         <span>I have read the list of disqualifying offenses above. The statements I am attesting to are true, and I agree to the notification requirement.</span></label></div>
       <div class="field"><label>Type your full name to sign</label><input id="att_name" value="${esc(u.name)}"></div>
       <button class="btn" style="max-width:240px" onclick="window._attSign()">Sign attestation</button>
-      <p class="fineprint">This attestation reflects Ohio DODD rule 5123-2-02. Frontline recommends final review by its compliance officer or attorney before official use.</p>
     </div></div>`);
   window._attSign=()=>{
     if(!document.getElementById('att_agree').checked){alert('Please check the box to confirm your attestation.');return;}
     const nm=(document.getElementById('att_name').value||'').trim(); if(!nm){return;}
     prog()._attest={name:nm,date:new Date().toLocaleString()};save();toast("Signed ✓","Background check attestation recorded.");go('attest');
+  };
+}
+/* ===================== MEDIA & PHOTO CONSENT ===================== */
+function renderMedia(){
+  const u=user(); const a=prog()._media;
+  if(a){shell(`<button class="backlink" onclick="go('dash')">&larr; Back to dashboard</button>
+    <div class="viewer"><div class="viewer-head"><div class="kick">Consent</div><h2>📷 Media & photo consent</h2></div>
+    <div class="viewer-body"><div class="callout"><b>On file (this device):</b> ${esc(a.name)} ${a.choice==='consent'?'<b style="color:var(--teal)">consented to</b>':'<b style="color:var(--rust)">declined</b>'} media use on ${esc(a.date)}.</div>
+    <button class="btn ghost sm" style="max-width:200px;margin-top:12px" onclick="window._mediaReset()">Change my choice</button></div></div>`);
+    window._mediaReset=()=>{prog()._media=null;save();go('media');};return;}
+  const consent = `
+    <p style="margin:.1em 0 .4em"><b>FRONTLINE HEALTHCARE LLC</b><br>Media &amp; Photo Consent / Release</p>
+    <p>From time to time, Frontline Healthcare may take photographs or video and audio recordings of our team for use in agency materials. With your permission, we would like to include you. <b>Your choice is completely voluntary and will not affect your employment.</b></p>
+    <p>If I select "I consent" below, I grant Frontline Healthcare permission to:</p>
+    <p><b>1.</b> Photograph, film, or record my image, likeness, voice, and first name; and</p>
+    <p><b>2.</b> Use them in agency materials &mdash; including the website, social media, newsletters, recruiting and marketing materials, training materials, and internal communications &mdash; without payment to me.</p>
+    <p><b>3.</b> I release Frontline Healthcare and its staff from any claims arising from this use, and I understand these materials may be seen publicly and may remain in use after my employment ends.</p>
+    <p><b>4.</b> I understand I may withdraw my consent for <i>future</i> use at any time by notifying Human Resources in writing.</p>`;
+  shell(`<button class="backlink" onclick="go('dash')">&larr; Back to dashboard</button>
+    <div class="viewer"><div class="viewer-head"><div class="kick">Consent</div><h2>📷 Media &amp; Photo Consent</h2></div>
+    <div class="viewer-body">
+      <p>Please read the consent below, choose an option, and sign.</p>
+      <div class="callout" style="max-height:300px;overflow:auto;font-size:13.5px;line-height:1.5">${consent}</div>
+      <div class="field" style="margin-top:10px">
+        <label style="display:flex;gap:9px;align-items:flex-start;font-weight:400;color:var(--ink);margin-bottom:10px">
+          <input type="radio" name="media_choice" id="media_yes" value="consent" style="width:18px;height:18px;accent-color:var(--teal);margin-top:1px">
+          <span><b>I CONSENT</b> &mdash; Frontline may use my image, likeness, voice, and first name as described above.</span></label>
+        <label style="display:flex;gap:9px;align-items:flex-start;font-weight:400;color:var(--ink)">
+          <input type="radio" name="media_choice" id="media_no" value="decline" style="width:18px;height:18px;accent-color:var(--teal);margin-top:1px">
+          <span><b>I DO NOT CONSENT</b> &mdash; Please do not use my image or likeness.</span></label></div>
+      <div class="field"><label>Type your full name to sign</label><input id="media_name" value="${esc(u.name)}"></div>
+      <button class="btn" style="max-width:210px" onclick="window._mediaSign()">Submit consent</button>
+    </div></div>`);
+  window._mediaSign=()=>{
+    const yes=document.getElementById('media_yes').checked, no=document.getElementById('media_no').checked;
+    if(!yes&&!no){alert('Please choose whether or not you consent.');return;}
+    const nm=(document.getElementById('media_name').value||'').trim(); if(!nm){return;}
+    prog()._media={choice:yes?'consent':'decline',name:nm,date:new Date().toLocaleString()};save();
+    toast("Submitted ✓","Media consent recorded.");go('media');
   };
 }
 /* ===================== FINISH / COMPLETION PROMPT ===================== */
