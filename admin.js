@@ -8,6 +8,8 @@
 (function injectAdminCSS() {
   const css = `
 .adm-page { min-height: 100vh; background: #f0f4f5; }
+html, body { height:100%; overflow-y:auto !important; }
+#app { height:auto !important; overflow:visible !important; }
 .adm-topbar {
   background: linear-gradient(135deg, #014A54 0%, #028090 100%);
   color: #fff; display: flex; align-items: center; justify-content: space-between;
