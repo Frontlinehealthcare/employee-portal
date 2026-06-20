@@ -272,7 +272,7 @@ function buildDetailHTML(s, idx) {
       <div class="adm-quiz-mod-title"><span>${_e(modTitle)}</span><span class="qscore">${scoreLabel} ${passLabel}</span></div>
       ${questionsHTML}</div>`;
   }).filter(Boolean).join('');
-  const quizXTML=quizBlocks?`<div class="adm-detail-section"><div class="adm-detail-heading">Compliance Quiz Answers</div>${quizBlocks}</div>`:'';
+  const quizHTML=quizBlocks?`<div class="adm-detail-section"><div class="adm-detail-heading">Compliance Quiz Answers</div>${quizBlocks}</div>`:'';
 
   /* Uploaded Documents (async — populated when detail panel opens) */
   const docsHTML=`<div class="adm-detail-section">
