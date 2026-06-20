@@ -99,6 +99,16 @@ html, body { height:100%; overflow-y:auto !important; }
   .adm-body, .adm-topbar { padding-left:16px; padding-right:16px; }
   .adm-detail-grid { grid-template-columns:1fr; }
 }
+.adm-doc-field { margin-bottom:12px; }
+.adm-doc-field:last-child { margin-bottom:0; }
+.adm-doc-field-name { font-size:.73rem; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#526A72; margin-bottom:5px; }
+.adm-doc-files { display:flex; flex-wrap:wrap; gap:6px; }
+.adm-doc-link { display:inline-flex; align-items:center; gap:5px; font-size:.8rem; padding:5px 12px; border-radius:7px; background:#e8f4f6; color:#014A54; text-decoration:none; border:1px solid #b2d8de; font-weight:600; transition:.15s; }
+.adm-doc-link:hover { background:#014A54; color:#fff; border-color:#014A54; }
+.adm-doc-link::before { content:'📄'; font-size:.75rem; }
+.adm-doc-empty { font-size:.82rem; color:#aaa; font-style:italic; }
+.adm-doc-meta { font-size:.72rem; color:#888; margin-bottom:10px; }
+.adm-docs-spinner { display:inline-block; width:14px; height:14px; border:2px solid #dce7e9; border-top-color:#028090; border-radius:50%; animation:admSpin .8s linear infinite; vertical-align:middle; margin-right:6px; }
 `;
   const el = document.createElement('style');
   el.textContent = css;
@@ -122,6 +132,43 @@ function timeAgo(isoStr) {
   if (m > 0) return m+'m ago'; return 'just now';
 }
 
+/* ── Document fetch & match ───────────────────────────────────────────────── */
+let _adminDocsCache = null;
+let _adminDocsFetching = false;
+const DOCS_URL = 'https://www.frontlinehealthcareohio.com/_functions/getFormSubmissions?adminCode=FLH-ADMIN';
+
+async function fetchAdminDocs() {
+  if (_adminDocsCache !== null) return _adminDocsCache;
+  if (_adminDocsFetching) {
+    // Wait up to 10s for in-flight request
+    for (let i=0;i<20;i++) { await new Promise(r=>setTimeout(r,500)); if(_adminDocsCache!==null)return _adminDocsCache; }
+    return [];
+  }
+  _adminDocsFetching = true;
+  try {
+    const resp = await fetch(DOCS_URL);
+    const data = await resp.json();
+    _adminDocsCache = data.submissions || [];
+  } catch(e) { _adminDocsCache = []; }
+  _adminDocsFetching = false;
+  return _adminDocsCache;
+}
+
+function normName(s) { return (s||'').toLowerCase().replace(/\s+/g,' ').trim(); }
+
+function findMatchingSubmission(subs, employeeName) {
+  if (!subs || !subs.length || !employeeName) return null;
+  const emp = normName(employeeName);
+  for (const sub of subs) {
+    const ci = sub.contactInfo || {};
+    const parts = [ci.firstName, ci.lastName].filter(Boolean);
+    const full = normName(parts.length ? parts.join(' ') : (ci.name || ''));
+    if (!full) continue;
+    if (full === emp || emp.includes(full) || full.includes(emp)) return sub;
+  }
+  return null;
+}
+
 function adminChecklist(state) {
   const pr = state.prog||{}, pf = state.profile||{}, ap = state.application||{};
   return {
@@ -139,7 +186,7 @@ function adminOverallPct(cl) {
   return Math.round(all.filter(Boolean).length/all.length*100);
 }
 
-function buildDetailHTML(s) {
+function buildDetailHTML(s, idx) {
   const pf=s.profile||{}, ap=s.application||{}, pr=s.prog||{};
 
   /* Personal Information */
@@ -225,10 +272,16 @@ function buildDetailHTML(s) {
       <div class="adm-quiz-mod-title"><span>${_e(modTitle)}</span><span class="qscore">${scoreLabel} ${passLabel}</span></div>
       ${questionsHTML}</div>`;
   }).filter(Boolean).join('');
-  const quizHTML=quizBlocks?`<div class="adm-detail-section"><div class="adm-detail-heading">Compliance Quiz Answers</div>${quizBlocks}</div>`:'';
+  const quizXTML=quizBlocks?`<div class="adm-detail-section"><div class="adm-detail-heading">Compliance Quiz Answers</div>${quizBlocks}</div>`:'';
+
+  /* Uploaded Documents (async — populated when detail panel opens) */
+  const docsHTML=`<div class="adm-detail-section">
+    <div class="adm-detail-heading">&#128196; Uploaded Documents</div>
+    <div id="adm-docs-${idx}"><span class="adm-docs-spinner"></span><span style="font-size:.82rem;color:#888">Loading documents…</span></div>
+  </div>`;
 
   const hasContent=(pf.first||pf.last||pf.dob||pf.phone)||(ap.pos||ap._complete)||empItems||goalFields.length||quizBlocks;
-  return hasContent?(personalHTML+applHTML+histHTML+goalsHTML+quizHTML):'<p class="adm-no-data" style="padding:8px 0">No profile data recorded yet.</p>';
+  return (hasContent?(personalHTML+applHTML+histHTML+goalsHTML+quizHTML):'')+docsHTML;
 }
 
 function renderCards(rows) {
@@ -268,7 +321,7 @@ function renderCards(rows) {
         <span class="adm-last">Last active: ${timeAgo(r.lastUpdated)}</span>
         <button class="adm-expand-btn" onclick="adminToggleDetail(${idx})">&#9660; View profile details</button>
       </div>
-      <div class="adm-detail" id="adm-detail-${idx}">${buildDetailHTML(s)}</div>
+      <div class="adm-detail" id="adm-detail-${idx}">${buildDetailHTML(s,idx)}</div>
     </div>`;
   }).join('');
 }
@@ -279,6 +332,39 @@ window.adminToggleDetail=function(idx){
   if(!el)return;
   el.classList.toggle('open');
   if(btn)btn.innerHTML=el.classList.contains('open')?'&#9650; Hide details':'&#9660; View profile details';
+  if(el.classList.contains('open')){
+    const rec=window._adminRecords[idx];
+    const empName=rec?(((rec.state||{}).user||{}).name||''):'';
+    loadEmployeeDocs(idx,empName);
+  }
+};
+
+window.loadEmployeeDocs=async function(idx,employeeName){
+  const el=document.getElementById('adm-docs-'+idx);
+  if(!el||el.dataset.loaded==="1")return;
+  el.dataset.loaded="1";
+  try {
+    const subs=await fetchAdminDocs();
+    const match=findMatchingSubmission(subs,employeeName);
+    if(!match){
+      el.innerHTML='<span class="adm-doc-empty">No document submission found for this employee yet.</span>';
+      return;
+    }
+    if(!match.fileFields||!match.fileFields.length){
+      el.innerHTML='<span class="adm-doc-empty">Form submitted but no files were uploaded.</span>';
+      return;
+    }
+    const date=match.submittedAt?new Date(match.submittedAt).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}):'';
+    const fieldsHTML=match.fileFields.map(function(ff){
+      const linksHTML=ff.files.map(function(f){
+        return '<a class="adm-doc-link" href="'+_e(f.url)+'" target="_blank" rel="noopener">'+_e(f.fileName)+'</a>';
+      }).join('');
+      return '<div class="adm-doc-field"><div class="adm-doc-field-name">'+_e(ff.fieldName)+'</div><div class="adm-doc-files">'+linksHTML+'</div></div>';
+    }).join('');
+    el.innerHTML=(date?'<div class="adm-doc-meta">Submitted '+_e(date)+'</div>':'')+fieldsHTML;
+  } catch(e) {
+    el.innerHTML='<span class="adm-doc-empty">Could not load documents.</span>';
+  }
 };
 
 window.renderAdmin=function(){
@@ -300,8 +386,7 @@ window.renderAdmin=function(){
     </div>
     <div class="adm-body">
       <div class="adm-toolbar">
-        <input type="text" id="adm-search" placeholder="Search by name, role, or code…" oninput="adminFilter()">
-        <select id="adm-filter" onchange="adminFilter()">
+        <input type="text" id="adm-search"         <select id="adm-filter" onchange="adminFilter()">
           <option value="all">All employees</option>
           <option value="done">Fully complete</option>
           <option value="prog">In progress</option>
@@ -338,18 +423,18 @@ window.adminFilter=function(){
   renderCards(window._adminRecords.filter(r=>{
     const u=(r.state||{}).user||{}, pct=r._pct||0;
     return (fil==='all'||(fil==='done'&&pct===100)||(fil==='prog'&&pct>0&&pct<100)||(fil==='new'&&pct===0))&&
-      (!q||(u.name||'').toLowerCase().includes(q)||(u.role||'').toLowerCase().includes(q)||(u.code||'').toLowerCase().includes(q));
+    (!q||(u.name||'').toLowerCase().includes(q)||(u.role||'').toLowerCase().includes(q)||(u.code||'').toLowerCase().includes(q));
   }));
 };
 
 window.renderAdminWithData=function(records,error){
   document.getElementById('adm-loading').style.display='none';
   if(error){const nc=document.getElementById('adm-nocloud');nc.style.display='block';
-    nc.innerHTML=`<p>&#9888; <strong>Could not load employee data.</strong></p><p>${_e(error)}</p>`;return;}
+  nc.innerHTML=`<p>&#9888; <strong>Could not load employee data.</strong></p><p>${_e(error)}</p>`;return;}
   records.forEach(r=>{r._cl=adminChecklist(r.state||{});r._pct=adminOverallPct(r._cl);});
   window._adminRecords=records;
   const total=records.length,done=records.filter(r=>r._pct===100).length,
-    prog=records.filter(r=>r._pct>0&&r._pct<100).length,nw=records.filter(r=>r._pct===0).length;
+  prog=records.filter(r=>r._pct>0&&r._pct<100).length,nw=records.filter(r=>r._pct===0).length;
   const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
   set('adm-n-total',total);set('adm-n-done',done);set('adm-n-prog',prog);set('adm-n-new',nw);
   document.getElementById('adm-cards-wrap').style.display='flex';
