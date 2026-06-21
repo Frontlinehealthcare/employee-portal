@@ -7,27 +7,27 @@
 /* ── CSS ──────────────────────────────────────────────────────────────────── */
 (function injectAdminCSS() {
   const css = `
-.adm-page { min-height: 100vh; background: #f0f4f5; }
-html, body { height:100%; overflow-y:auto !important; }
-#app { height:auto !important; overflow:visible !important; }
+.adm-page { height: 100vh; display: flex; flex-direction: column; overflow: hidden; background: #f0f4f5; }
+html, body { height:100%; overflow:hidden !important; margin:0; padding:0; }
+#app { height:100% !important; overflow:hidden !important; }
 .adm-topbar {
   background: linear-gradient(135deg, #014A54 0%, #028090 100%);
   color: #fff; display: flex; align-items: center; justify-content: space-between;
-  padding: 0 28px; height: 62px; position: sticky; top: 0; z-index: 20;
+  padding: 0 28px; height: 62px; flex-shrink: 0;
   box-shadow: 0 4px 18px rgba(1,74,84,.25);
 }
 .adm-brand { font-family: Georgia,serif; font-weight: 700; font-size: 20px; }
 .adm-brand small { display:block; font-family:system-ui,Arial,sans-serif; font-weight:400; font-size:11px; color:#6FD8C7; letter-spacing:.6px; text-transform:uppercase; }
 .adm-signout { background:rgba(255,255,255,.15); border:1.5px solid rgba(255,255,255,.35); color:#fff; padding:8px 16px; border-radius:8px; font-size:13px; cursor:pointer; }
 .adm-signout:hover { background:rgba(255,255,255,.25); }
-.adm-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; padding:22px 28px; background:#fff; border-bottom:1px solid #dce7e9; }
+.adm-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; padding:22px 28px; background:#fff; border-bottom:1px solid #dce7e9; flex-shrink:0; }
 .adm-stat { background:#f8fbfc; border-radius:12px; padding:16px; text-align:center; border:1px solid #dce7e9; }
 .adm-stat .n { font-size:2.2rem; font-weight:800; color:#014A54; }
 .adm-stat.green .n { color:#1f8a5b; }
 .adm-stat.amber .n { color:#c07a00; }
 .adm-stat.gray  .n { color:#888; }
 .adm-stat .lbl { font-size:.77rem; color:#526A72; margin-top:3px; }
-.adm-body { padding:22px 28px; }
+.adm-body { padding:22px 28px; flex:1; overflow-y:auto; min-height:0; }
 .adm-toolbar { display:flex; gap:10px; margin-bottom:18px; align-items:center; flex-wrap:wrap; }
 .adm-toolbar input { flex:1; min-width:180px; padding:9px 14px; border:1.5px solid #dce7e9; border-radius:9px; font-size:.9rem; font-family:inherit; }
 .adm-toolbar input:focus { outline:none; border-color:#028090; }
